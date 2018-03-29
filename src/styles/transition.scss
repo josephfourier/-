@@ -1,0 +1,24 @@
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+    transition: all .4s
+}
+
+.breadcrumb-move {
+    transition: all .4s
+}
+
+.breadcrumb-leave-active {
+    position: absolute;
+}
+
+.breadcrumb-enter, .breadcrumb-leave-to {
+    opacity: 0;
+    transform: translateX(30px)
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to  {
+    opacity: 0;
+}
