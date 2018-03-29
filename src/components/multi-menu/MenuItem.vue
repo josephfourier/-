@@ -18,21 +18,21 @@
       </table>
       <ul v-else class="zjy-menu-panel__list">
 
-        <li 
+        <li
         class="zjy-menu-panel__item"
         :style="{border: elt =='radio' ? 'none' : ''}"
-        v-for="(item,index) in filteredData" 
-        :key="item[labelProp]" 
-        @click="select(item, index)" 
-        :class="{selected: highlight && selected 
-          ? selected[keyProp] === item[keyProp] 
+        v-for="(item,index) in filteredData"
+        :key="item[labelProp]"
+        @click="select(item, index)"
+        :class="{selected: highlight && selected
+          ? selected[keyProp] === item[keyProp]
           : false}">
           <el-content :option="item" v-if="elt === ''"></el-content>
           <span v-if="elt == 'radio'">
             <el-radio v-model="radio" :label="item[labelProp]">{{ item[labelProp] }}</el-radio>
           </span>
         </li>
-        
+
       </ul>
     </div>
   </div>
@@ -40,9 +40,9 @@
 
 <script>
 export default {
-  name: "MenuItem",
-  componentName: "MenuItem",
-  data() {
+  name: 'MenuItem',
+  componentName: 'MenuItem',
+  data () {
     return {
       query: '',
       selected: {},
@@ -52,7 +52,7 @@ export default {
   },
 
   methods: {
-    select(item, index) {
+    select (item, index) {
       this.selected = item
     }
   },
@@ -66,9 +66,9 @@ export default {
         td: String
       },
 
-      render(h) {
+      render (h) {
         const getParent = vm => {
-          if (vm.$options.componentName === "MenuItem") {
+          if (vm.$options.componentName === 'MenuItem') {
             return vm
           } else if (vm.$parent) {
             return getParent(vm.$parent)
@@ -92,7 +92,7 @@ export default {
     },
     title: {
       type: String,
-      default: "title"
+      default: 'title'
     },
     width: {
       type: String
@@ -104,20 +104,20 @@ export default {
     props: Object,
     type: {
       type: String,
-      default: "ul"
+      default: 'ul'
     },
     elt: {
       type: String,
-      default: ""
+      default: ''
     },
     renderContent: Function,
     defaultSelected: {
       type: Object,
-      default() {
+      default () {
         return {}
       }
     },
-    //是否高亮选中项
+    // 是否高亮选中项
     highlight: Boolean,
     placeholder: String,
     // 耦合度较高!
@@ -128,9 +128,9 @@ export default {
   },
 
   computed: {
-    filteredData() {
+    filteredData () {
       return this.data.filter(item => {
-        if (typeof this.filterMethod === "function") {
+        if (typeof this.filterMethod === 'function') {
           return this.filterMehond(this.query, item)
         } else {
           const label = item[this.labelProp]
@@ -142,44 +142,41 @@ export default {
       })
     },
 
-    keyProp() {
-      return this.props.key || "key"
+    keyProp () {
+      return this.props.key || 'key'
     },
 
-    labelProp() {
-      return this.props.label || "label"
+    labelProp () {
+      return this.props.label || 'label'
     }
   },
   watch: {
-    selected(val) {
-      if (val && val[this.keyProp]) this.$emit("selected-change", val)
+    selected (val) {
+      if (val && val[this.keyProp]) this.$emit('selected-change', val)
     },
 
     defaultSelected: {
       immediate: true,
-      handler(v, o) {
+      handler (v, o) {
         this.selected = v
         this.radio = v[this.labelProp]
       }
     },
 
     // 重置所有radio
-    dialogVisible(val, old) {
+    dialogVisible (val, old) {
       this.radio = val ? this.radio : -1
     },
 
-    level(val, old) {
-        if (Object.keys(this.defaultSelected).length === 0)
-          this.radio = '-1'
-      
+    level (val, old) {
+      if (Object.keys(this.defaultSelected).length === 0) { this.radio = '-1' }
     },
 
-    handler(val, old) {
-      if (Object.keys(this.defaultSelected).length === 0)
-        this.radio = '-1'
+    handler (val, old) {
+      if (Object.keys(this.defaultSelected).length === 0) { this.radio = '-1' }
     },
 
-    loading(val) {
+    loading (val) {
       if (val) this.innderLoading = true
       else this.innderLoading = false
     }

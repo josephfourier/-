@@ -12,29 +12,28 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'ElUploadDrag',
-    props: {
-      disabled: Boolean
+export default {
+  name: 'ElUploadDrag',
+  props: {
+    disabled: Boolean
+  },
+  data () {
+    return {
+      dragover: false
+    }
+  },
+  methods: {
+    onDragover () {
+      if (!this.disabled) {
+        this.dragover = true
+      }
     },
-    data() {
-      return {
-        dragover: false
-      };
-    },
-    methods: {
-      onDragover() {
-        if (!this.disabled) {
-          this.dragover = true;
-        }
-      },
-      onDrop(e) {
-        if (!this.disabled) {
-          this.dragover = false;
-          this.$emit('file', e.dataTransfer.files);
-        }
+    onDrop (e) {
+      if (!this.disabled) {
+        this.dragover = false
+        this.$emit('file', e.dataTransfer.files)
       }
     }
-  };
+  }
+}
 </script>
-

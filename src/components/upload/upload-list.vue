@@ -61,40 +61,40 @@
   </transition-group>
 </template>
 <script>
-  // import Locale from 'element-ui/src/mixins/locale';
-  import ElProgress from 'element-ui/packages/progress';
+// import Locale from 'element-ui/src/mixins/locale';
+import ElProgress from 'element-ui/packages/progress'
 
-  export default {
-    // mixins: [Locale],
+export default {
+  // mixins: [Locale],
 
-    data() {
-      return {
-        focusing: false
-      };
-    },
-    components: { ElProgress },
-
-    props: {
-      files: {
-        type: Array,
-        default() {
-          return [];
-        }
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      handlePreview: Function,
-      listType: String
-    },
-    methods: {
-      parsePercentage(val) {
-        return parseInt(val, 10);
-      },
-      handleClick(file) {
-        this.handlePreview && this.handlePreview(file);
-      }
+  data () {
+    return {
+      focusing: false
     }
-  };
+  },
+  components: { ElProgress },
+
+  props: {
+    files: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    handlePreview: Function,
+    listType: String
+  },
+  methods: {
+    parsePercentage (val) {
+      return parseInt(val, 10)
+    },
+    handleClick (file) {
+      this.handlePreview && this.handlePreview(file)
+    }
+  }
+}
 </script>

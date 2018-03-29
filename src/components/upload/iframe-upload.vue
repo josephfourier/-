@@ -1,5 +1,5 @@
 <script>
-import UploadDragger from './upload-dragger.vue';
+import UploadDragger from './upload-dragger.vue'
 
 export default {
   components: {
@@ -25,11 +25,11 @@ export default {
     beforeUpload: Function,
     onPreview: {
       type: Function,
-      default: function() {}
+      default: function () {}
     },
     onRemove: {
       type: Function,
-      default: function() {}
+      default: function () {}
     },
     drag: Boolean,
     listType: String,
@@ -38,96 +38,96 @@ export default {
     onExceed: Function
   },
 
-  data() {
+  data () {
     return {
       mouseover: false,
       domain: '',
       file: null,
       submitting: false
-    };
-  },
-
-  methods: {
-    isImage(str) {
-      return str.indexOf('image') !== -1;
-    },
-    handleClick() {
-      if (!this.disabled) {
-        this.$refs.input.click();
-      }
-    },
-    handleChange(ev) {
-      const file = ev.target.value;
-      if (file) {
-        this.uploadFiles(file);
-      }
-    },
-    uploadFiles(file) {
-      if (this.limit && this.$parent.uploadFiles.length + file.length > this.limit) {
-        this.onExceed && this.onExceed(this.fileList);
-        return;
-      }
-
-      if (this.submitting) return;
-      this.submitting = true;
-      this.file = file;
-      this.onStart(file);
-
-      const formNode = this.getFormNode();
-      const dataSpan = this.getFormDataNode();
-      let data = this.data;
-      if (typeof data === 'function') {
-        data = data(file);
-      }
-      const inputs = [];
-      for (const key in data) {
-        if (data.hasOwnProperty(key)) {
-          inputs.push(`<input name="${key}" value="${data[key]}"/>`);
-        }
-      }
-      dataSpan.innerHTML = inputs.join('');
-      formNode.submit();
-      dataSpan.innerHTML = '';
-    },
-    getFormNode() {
-      return this.$refs.form;
-    },
-    getFormDataNode() {
-      return this.$refs.data;
     }
   },
 
-  created() {
-    this.frameName = 'frame-' + Date.now();
-  },
-
-  mounted() {
-    const self = this;
-    !this.$isServer && window.addEventListener('message', (event) => {
-      if (!self.file) return;
-      const targetOrigin = new URL(self.action).origin;
-      if (event.origin !== targetOrigin) return;
-      const response = event.data;
-      if (response.result === 'success') {
-        self.onSuccess(response, self.file);
-      } else if (response.result === 'failed') {
-        self.onError(response, self.file);
+  methods: {
+    isImage (str) {
+      return str.indexOf('image') !== -1
+    },
+    handleClick () {
+      if (!this.disabled) {
+        this.$refs.input.click()
       }
-      self.submitting = false;
-      self.file = null;
-    }, false);
+    },
+    handleChange (ev) {
+      const file = ev.target.value
+      if (file) {
+        this.uploadFiles(file)
+      }
+    },
+    uploadFiles (file) {
+      if (this.limit && this.$parent.uploadFiles.length + file.length > this.limit) {
+        this.onExceed && this.onExceed(this.fileList)
+        return
+      }
+
+      if (this.submitting) return
+      this.submitting = true
+      this.file = file
+      this.onStart(file)
+
+      const formNode = this.getFormNode()
+      const dataSpan = this.getFormDataNode()
+      let data = this.data
+      if (typeof data === 'function') {
+        data = data(file)
+      }
+      const inputs = []
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          inputs.push(`<input name="${key}" value="${data[key]}"/>`)
+        }
+      }
+      dataSpan.innerHTML = inputs.join('')
+      formNode.submit()
+      dataSpan.innerHTML = ''
+    },
+    getFormNode () {
+      return this.$refs.form
+    },
+    getFormDataNode () {
+      return this.$refs.data
+    }
   },
 
-  render(h) {
+  created () {
+    this.frameName = 'frame-' + Date.now()
+  },
+
+  mounted () {
+    const self = this
+    !this.$isServer && window.addEventListener('message', (event) => {
+      if (!self.file) return
+      const targetOrigin = new URL(self.action).origin
+      if (event.origin !== targetOrigin) return
+      const response = event.data
+      if (response.result === 'success') {
+        self.onSuccess(response, self.file)
+      } else if (response.result === 'failed') {
+        self.onError(response, self.file)
+      }
+      self.submitting = false
+      self.file = null
+    }, false)
+  },
+
+  render (h) {
     const {
       drag,
       uploadFiles,
       listType,
       frameName,
       disabled
-    } = this;
-    const oClass = { 'el-upload': true };
-    oClass[`el-upload--${listType}`] = true;
+    } = this
+    const oClass = { 'el-upload': true }
+    oClass[`el-upload--${listType}`] = true
 
     return (
       <div
@@ -161,7 +161,7 @@ export default {
             : this.$slots.default
         }
       </div>
-    );
+    )
   }
-};
+}
 </script>

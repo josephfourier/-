@@ -21,13 +21,13 @@ export default {
   },
 
   methods: {
-    handleClick() {
+    handleClick () {
       this.$emit('click', this.value)
     }
   },
 
   watch: {
-    value(val) {
+    value (val) {
       this.$emit('change', val)
     }
   }
@@ -36,20 +36,21 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.zjy-search-panel__body {
-  .zjy-search-panel__label {
-    font-size: 12px;
-    color: #444444;
+  .zjy-search-panel__body {
+    .zjy-search-panel__label {
+      font-size: 12px;
+      color: #444444;
+    }
+    .zjy-search-panel__button {
+      background: #37c6d4 url(./ic_search.png) 16px 10px no-repeat;
+      width: 50px;
+      height: 34px;
+      display: inline-block;
+      vertical-align: top;
+    }
+    .el-input {
+      width: auto;
+      margin-right: 4px;
+    }
   }
-  .zjy-search-panel__button {
-    background: #37c6d4 url(./ic_search.png) 16px 10px no-repeat;
-    width: 50px;
-    height: 34px;
-    display: inline-block;
-    vertical-align: top;
-  }
-  .el-input {
-    width: auto;
-  }
-}
 </style>

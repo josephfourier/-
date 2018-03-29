@@ -19,14 +19,14 @@ import MyInsurances from './MyInsurances'
 import AllInsurances from './AllInsurances'
 
 export default {
-  data() {
+  data () {
     return {
       current: 'my',
-      active: false, // 组件通信
+      active: false // 组件通信
     }
   },
   methods: {
-    tabClick(tab, event) {
+    tabClick (tab, event) {
       this.active = !this.active
     }
   },

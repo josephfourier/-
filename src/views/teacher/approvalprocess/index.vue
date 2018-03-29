@@ -1,22 +1,22 @@
 <template>
   <div class="app-approval">
-    <MultiMenu 
-      class="zjy-multi-menu" 
-      :data="data" 
-      v-model="value" 
-      :titles="titles" 
-      :widths="widths" 
-      :filterable="filterable" 
-      :props="props" 
-      :types="types" 
-      :placeholder="placeholder" 
-      :render-content="renderFunc" 
-      :selected="selected" 
-      :elts="elts" 
-      :defaultSelected="data[0]" 
-      @selected-change="selectedChange" 
-      @del="del" 
-      @create="create" 
+    <MultiMenu
+      class="zjy-multi-menu"
+      :data="data"
+      v-model="value"
+      :titles="titles"
+      :widths="widths"
+      :filterable="filterable"
+      :props="props"
+      :types="types"
+      :placeholder="placeholder"
+      :render-content="renderFunc"
+      :selected="selected"
+      :elts="elts"
+      :defaultSelected="data[0]"
+      @selected-change="selectedChange"
+      @del="del"
+      @create="create"
       @config="config"
       :highlights="[true, false]"
       :loading="loading"
@@ -49,15 +49,15 @@
         </div>
       </div>
 
-      <MultiMenu 
-        class="zjy-multi-menu" 
-        :data="positions" 
-        v-model="teachers" 
-        :titles="['选择职务','选择个人']" 
-        :widths="['285px', '285px']" 
-        :filterable="[true, true]" 
-        :props="props2" 
-        :elts="['radio','radio']" 
+      <MultiMenu
+        class="zjy-multi-menu"
+        :data="positions"
+        v-model="teachers"
+        :titles="['选择职务','选择个人']"
+        :widths="['285px', '285px']"
+        :filterable="[true, true]"
+        :props="props2"
+        :elts="['radio','radio']"
         :dialogVisible="dialogVisible"
         :level="level"
         :handler="handler"
@@ -78,14 +78,14 @@
 </template>
 
 <script>
-import MultiMenu from "@/components/multi-menu/Menu"
-import approvalAPI from "@/api/approval"
+import MultiMenu from '@/components/multi-menu/Menu'
+import approvalAPI from '@/api/approval'
 
-import ZjyButton from "@/components/button"
+import ZjyButton from '@/components/button'
 
 export default {
-  name: "App",
-  data() {
+  name: 'App',
+  data () {
     return {
       // 主菜单数据
       data: [],
@@ -97,10 +97,10 @@ export default {
       selected: {},
 
       // 菜单标题
-      titles: ["1.选择功能", "2.流程设置"],
+      titles: ['1.选择功能', '2.流程设置'],
 
       // 菜单宽度
-      widths: ["200px", "600px"],
+      widths: ['200px', '600px'],
 
       // 菜单是否显示搜索
       filterable: [true, false],
@@ -110,33 +110,33 @@ export default {
 
       props: [
         {
-          key: "permissionId",
-          label: "name"
+          key: 'permissionId',
+          label: 'name'
         },
         {
-          key: "approvalStep",
-          label: "postName"
+          key: 'approvalStep',
+          label: 'postName'
         }
       ],
 
       // 弹出窗主菜单属性
       props2: [
         {
-          key: "postId",
-          label: "postName"
+          key: 'postId',
+          label: 'postName'
         },
         {
-          key: "teacherId",
-          label: "teacherName"
+          key: 'teacherId',
+          label: 'teacherName'
         }
       ],
 
       // 菜单主体渲染类型
-      types: ["ul", "table"],
+      types: ['ul', 'table'],
 
       // 渲染函数
-      renderFunc(h, option, type) {
-        if (type === "ul") {
+      renderFunc (h, option, type) {
+        if (type === 'ul') {
           return <span>{option.name}</span>
         }
       },
@@ -153,10 +153,10 @@ export default {
 
       // 处理人
       handler: '-1',
-    
+
       // 职务信息
       positions: [],
-      
+
       // 选择的职务
       selectedPost: {},
 
@@ -172,7 +172,7 @@ export default {
       // 渲染checkbox, radio
       elts: [],
 
-      placeholder: "请输入搜索条件",
+      placeholder: '请输入搜索条件',
 
       // 更新回显
       // 默认选中的职务
@@ -187,48 +187,47 @@ export default {
   },
 
   methods: {
-    selectedChange(item) {
+    selectedChange (item) {
       this.selected = item
       this.queryApprovalProcess(this.selected[this.keyPropMain])
     },
 
     // 根据id查询步骤列表
-    queryApprovalProcess(id) {
+    queryApprovalProcess (id) {
       this.loading = true
       approvalAPI
         .queryApprovalProcess(id)
         .then(resp => {
           // 过滤错误数据(无templateUid定义为错误数据)
           this.value = resp.data == null
-           ? [] 
-           : resp.data
-            .filter(x => x.templateUid)
-            .sort((x, y) => +x.approvalStep - +y.approvalStep)
-            this.loading = false
-        
+            ? []
+            : resp.data
+              .filter(x => x.templateUid)
+              .sort((x, y) => +x.approvalStep - +y.approvalStep)
+          this.loading = false
         }
         )
         .catch(err => {})
     },
 
-    del(item) {
+    del (item) {
       if (!item.templateUid) {
-        this.value.splice(this.value.length-1, 1)
+        this.value.splice(this.value.length - 1, 1)
         this.$alert('删除成功')
-        return 
+        return
       }
 
       approvalAPI.deleteProvalProcess(item.templateUid)
-      .then(resp => {
-        if (resp.code === 1) {
-          this.value.splice(this.value.findIndex(v => v.templateUid === item.templateUid), 1)
-          this.$alert('删除成功')
-        }
-      })
-      .catch (err => {})
+        .then(resp => {
+          if (resp.code === 1) {
+            this.value.splice(this.value.findIndex(v => v.templateUid === item.templateUid), 1)
+            this.$alert('删除成功')
+          }
+        })
+        .catch(err => {})
     },
 
-    reset() {
+    reset () {
       this.level = this.handler = '-1'
       this.dialogVisible = false
       this.teachers = []
@@ -239,11 +238,11 @@ export default {
       this.defaultSelectedTeacher = {}
     },
 
-    config(item) {
-      this.isUpdate = item.arg.templateUid ? true : false
+    config (item) {
+      this.isUpdate = !!item.arg.templateUid
       this.dialogVisible = true
-      this.handlers.length === 0 ? this.queryApprovalHandler() : ""
-      this.levels.length === 0 ? this.queryApprovalLevel() : ""
+      this.handlers.length === 0 ? this.queryApprovalHandler() : ''
+      this.levels.length === 0 ? this.queryApprovalLevel() : ''
 
       this.currentStep = item.arg.approvalStep
 
@@ -257,7 +256,7 @@ export default {
     },
 
     // 查询处理人类型
-    queryApprovalHandler() {
+    queryApprovalHandler () {
       approvalAPI
         .queryApprovalHandler()
         .then(resp => this.handlers = resp.data === null ? [] : resp.data)
@@ -265,7 +264,7 @@ export default {
     },
 
     // 查询处理级别
-    queryApprovalLevel() {
+    queryApprovalLevel () {
       approvalAPI
         .queryApprovalLevel()
         .then(resp => this.levels = resp.data === null ? [] : resp.data)
@@ -273,11 +272,11 @@ export default {
     },
 
     // 根据级别查询职务
-    queryPostList(level) {
+    queryPostList (level) {
       this.teachers = []
 
-      if (this.handler == -1 || this.level == -1) return 
-  
+      if (this.handler == -1 || this.level == -1) return
+
       approvalAPI
         .queryPostList(level)
         .then(resp => this.positions = resp.data === null ? [] : resp.data)
@@ -285,130 +284,126 @@ export default {
     },
 
     // 添加步骤
-    create() {
+    create () {
       const keyProp = this.props[1].key
       const labelProp = this.props[1].label
 
       if (this.value.length === 0) {
         this.value.push({
           approvalStep: 1,
-          postName: ""
+          postName: ''
         })
       } else {
         const key = this.value[this.value.length - 1][keyProp]
-        const done = this.value[this.value.length - 1][labelProp] !== ""
+        const done = this.value[this.value.length - 1][labelProp] !== ''
         if (!done) {
-          this.$alert("请先配置第" + key + " 步的信息")
+          this.$alert('请先配置第' + key + ' 步的信息')
           return
         }
 
         this.value.push({
           approvalStep: key + 1,
-          postName: ""
+          postName: ''
         })
       }
     },
 
     // 保存流程步骤
-    saveOrUpdate() {
-
+    saveOrUpdate () {
       if (Object.keys(this.selectedPost).length === 0) {
         this.$alert('请选择职务')
-        return 
+        return
       } else if (this.handler === '2' && Object.keys(this.selectedTeacher).length === 0) {
         this.$alert('请选择个人')
         return
       }
       !this.isUpdate
-       ? approvalAPI.createProvalProcess(this.__create())
-        .then(resp => {
-          if (resp.code === 1) {
-            this.$alert('配置成功')
+        ? approvalAPI.createProvalProcess(this.__create())
+          .then(resp => {
+            if (resp.code === 1) {
+              this.$alert('配置成功')
+              this.queryApprovalProcess(this.selected[this.keyPropMain])
+            }
+          })
+          .catch(err => {})
+        : approvalAPI.updateProvalProcess(this.__create())
+          .then(resp => {
             this.queryApprovalProcess(this.selected[this.keyPropMain])
-          }
-        })
-        .catch (err => {})
-      : approvalAPI.updateProvalProcess(this.__create())
-        .then(resp => {
-          this.queryApprovalProcess(this.selected[this.keyPropMain])
-        })
-        .catch(err => {
+          })
+          .catch(err => {
 
-        })
-        
+          })
+
       this.reset()
     },
 
-    __getType() {
+    __getType () {
       if (this.handler === '1') {
         return {
           postName: this.selectedPost.postName,
-          postId: this.selectedPost.postId,
+          postId: this.selectedPost.postId
         }
       } else if (this.handler === '2') {
         return {
           teacherId: this.selectedTeacher.teacherId,
-          teacherName: this.selectedTeacher.teacherName,
+          teacherName: this.selectedTeacher.teacherName
         }
       }
     },
 
-
     // 创建一个表单提交实体
-    __create() {
+    __create () {
       const type = this.__getType()
       return {
-        templateUid     : this.currentUid || null,
-        permissionId    : this.selected.permissionId,
-        permissionName  : this.selected.name,
-        approvalStep    : this.currentStep,
-        approvalType    : this.handler,
-        teacherLevel    : this.level,
-        approvalUri     : this.selected.approvalUri,
-        postName        : this.selectedPost.postName || null,
-        postId          : this.selectedPost.postId || null,
-        teacherId       : this.selectedTeacher.teacherId || null,
-        teacherName     : this.selectedTeacher.teacherName || null
+        templateUid: this.currentUid || null,
+        permissionId: this.selected.permissionId,
+        permissionName: this.selected.name,
+        approvalStep: this.currentStep,
+        approvalType: this.handler,
+        teacherLevel: this.level,
+        approvalUri: this.selected.approvalUri,
+        postName: this.selectedPost.postName || null,
+        postId: this.selectedPost.postId || null,
+        teacherId: this.selectedTeacher.teacherId || null,
+        teacherName: this.selectedTeacher.teacherName || null
       }
     },
 
-    updateTeachers(item) {
-      
+    updateTeachers (item) {
       this.selectedPost = item
       if (this.handler === '1') return
       approvalAPI.queryTeacherList(item.postId)
-        .then (resp => {
+        .then(resp => {
           this.teachers = resp.data
           if (this.isUpdate) {
             this.defaultSelectedTeacher = this.teachers.find(i => i.teacherId === item.teacherId)
           }
         })
-        .catch (err => {})
+        .catch(err => {})
     },
 
     // 选中的教师信息
-    selectTeacher(item) {
+    selectTeacher (item) {
       this.selectedTeacher = item
     }
   },
 
-  
   components: {
     MultiMenu,
     ZjyButton
   },
 
   computed: {
-    keyPropMain() {
-      return this.props[0].key || "key"
+    keyPropMain () {
+      return this.props[0].key || 'key'
     },
 
-    labelPropMain() {
-      return this.props[0].label || "label"
+    labelPropMain () {
+      return this.props[0].label || 'label'
     }
   },
 
-  created() {
+  created () {
     approvalAPI
       .queryApprovalList()
       .then(resp => {
@@ -418,15 +413,15 @@ export default {
   },
 
   watch: {
-    level(val, old) {
+    level (val, old) {
       if (val === old) return
-      
+
       this.selectedPost = {}
       this.selectedTeacher = {}
       this.queryPostList(val)
     },
 
-    handler(val, old) {
+    handler (val, old) {
       if (val === old) return
       this.selectedPost = {}
       this.selectedTeacher = {}
@@ -437,19 +432,19 @@ export default {
       // }
 
       this.queryPostList(this.level)
-      
+
       if (old === '1' || old === '2') this.defaultSelectedPost = {}
     },
 
-    defaultSelectedPost(val, old) {
-    if (Object.keys(val).length !== 0 && this.handler === '2') {
-      approvalAPI.queryTeacherList(val.postId)
-        .then (resp => {
-          this.teachers = resp.data
-        })
-        .catch (err => {})
+    defaultSelectedPost (val, old) {
+      if (Object.keys(val).length !== 0 && this.handler === '2') {
+        approvalAPI.queryTeacherList(val.postId)
+          .then(resp => {
+            this.teachers = resp.data
+          })
+          .catch(err => {})
+      }
     }
-  }
 
   }
 }

@@ -34,34 +34,35 @@
                 <p v-if="index === step - 1 && approver">
                   ({{ nextApproverName }})
                 </p>
-               
+
               </div>
               <div v-if="index <= step - 1 && item.approvalStatus">
                 <p :class="[
                 { statusYes: item.approvalStatus == 1 },
-                { statusNo: item.approvalStatus == 2 }, 
-                { statusWait: item.approvalStatus == 0 }, 
+                { statusNo: item.approvalStatus == 2 },
+                { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
                   ({{ item.approvalStatus | statusFormat }})
                 </p>
               </div>
             </div>
-          
-            <el-select 
-              class="zjy-select" 
-              v-model="approver" 
-              placeholder="请选择审批人" 
-              slot="custom" 
-              slot-scope="props" 
-              @change="handleChange" 
+
+            <el-select
+              class="zjy-select"
+              v-model="approver"
+              placeholder="请选择审批人"
+              slot="custom"
+              slot-scope="props"
+              @change="handleChange"
               v-if="props.data.approvalType == 1
-              && index === step - 1 
-              && !props.data.approvalStatus 
-              && isApprovered 
+              && index === step - 1
+              && !props.data.approvalStatus
+              && isApprovered
               && !reason"
             >
-              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName" :value="item.teacherId">
+              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
+                         :value="item.teacherId">
               </el-option>
             </el-select>
           </zjy-step>
@@ -91,15 +92,15 @@
 import Panel from '@/components/panel/panel'
 import PanelItem from '@/components/panel-item/panel-item'
 import ZjyButton from '@/components/button'
-import { ZjyStep, ZjySteps } from '@/components/steps'
-import ZjyInput from "@/components/input"
+import {ZjyStep, ZjySteps} from '@/components/steps'
+import ZjyInput from '@/components/input'
 
 import manageAPI from '@/api/teacher/insurance/manage'
 
-import { mapGetters } from 'vuex'
+import {mapGetters} from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
       step: 1,
       steps: [], // 审批流程步骤
@@ -113,9 +114,9 @@ export default {
       nextApproverId: '',
       reason: '', // 拒绝原因
       STATUS: {
-        awaiting  : "0",
-        yes       : "1",
-        no        : "2"
+        awaiting: '0',
+        yes: '1',
+        no: '2'
       },
 
       innerVisible: false
@@ -141,24 +142,25 @@ export default {
   },
 
   methods: {
-    handleChange(val) {
+    handleChange (val) {
       this.nextApproverId = val
-      if (this.hasNextApprover)
+      if (this.hasNextApprover) {
         this.nextApproverName = this.approverList.find(x => x.teacherId === val).teacherName
+      }
     },
 
-    yes() {
+    yes () {
       this.steps[this.step - 1].approvalStatus = this.STATUS.yes
       this.isApprovered = true
     },
 
-    no() {
+    no () {
       this.innerVisible = true
     },
 
-    innerYes() {
+    innerYes () {
       if (!this.reason) {
-        this.$alert("请输入拒绝原因")
+        this.$alert('请输入拒绝原因')
         return
       }
       this.steps[this.step - 1].approvalStatus = this.STATUS.no
@@ -166,7 +168,7 @@ export default {
       this.innerVisible = false
     },
 
-    innerNo() {
+    innerNo () {
       this.innerVisible = false
       this.reason = ''
     },
@@ -177,9 +179,9 @@ export default {
     //   this.isApprovered = false
     // },
 
-    submit() {
-      if (this.hasNextApprover && !this.approver  && !this.reason) {
-        this.$alert("请选择下一步审批人")
+    submit () {
+      if (this.hasNextApprover && !this.approver && !this.reason) {
+        this.$alert('请选择下一步审批人')
         return
       }
 
@@ -197,21 +199,22 @@ export default {
         .submit(this.data.insuranceUid, this.data.inssettingUid, this.steps)
         .then(response => {
           if (response.code === 1) {
-            this.$alert("保存成功")
+            this.$alert('保存成功')
           } else {
-            this.$alert("保存失败")
+            this.$alert('保存失败')
           }
           // this.clear()
-          this.$emit("submit", 1)
+          this.$emit('submit', 1)
         })
-        .catch(error => {})
+        .catch(error => {
+        })
     }
   },
 
   watch: {
     value: {
       immediate: true,
-      handler(val) {
+      handler (val) {
         if (this.$empty(val)) return
 
         this.steps = val.swmsApprovals.sort(
@@ -220,19 +223,15 @@ export default {
 
         try {
           this.step = this.steps.find(x => x.approvalStatus == 0).approvalStep
-          
+
           this.isMyStep = this.user.userDetailId === this.steps[this.step - 1].teacherId
-          
         } catch (e) {
-          
           const _ = this.steps.find(x => x.approvalStatus == 2)
           if (_) {
             this.step = _.approvalStep
-            this.isFinished = true
             this.reason = _.approvalOpinion
-            return
-          }
-          this.step = this.steps.length + 1
+          } else { this.step = this.steps.length + 1 }
+          this.isFinished = true
         }
 
         this.approverList = val[+Object.keys(val).find(x => Number(x) == x)] || {}
@@ -241,10 +240,10 @@ export default {
       }
     },
 
-    isApprovered(val) {
+    isApprovered (val) {
       if (val) this.step++
       else this.step--
-    },
+    }
 
     // closed(val) {
     //   if (val) this.clear()
@@ -253,27 +252,29 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
-.item {
-  margin-right: 50px;
-  margin-bottom: 15px;
-  &.block {
-    width: 100%;
+  .item {
+    margin-right: 50px;
+    margin-bottom: 15px;
+    &.block {
+      width: 100%;
+    }
   }
-}
-.status {
-  > span,
-  > img {
-    vertical-align: middle;
+
+  .status {
+    > span,
+    > img {
+      vertical-align: middle;
+    }
+    margin-bottom: 10px;
   }
-  margin-bottom: 10px;
-}
-.details {
-  padding: 20px;
-  background-color: #f5f5f5;
-  .title {
-    color: #333333;
-    font-weight: bold;
+
+  .details {
+    padding: 20px;
+    background-color: #f5f5f5;
+    .title {
+      color: #333333;
+      font-weight: bold;
+    }
+    margin-bottom: 15px;
   }
-  margin-bottom: 15px;
-}
 </style>

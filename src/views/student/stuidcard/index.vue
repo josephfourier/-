@@ -56,10 +56,10 @@
               </div>
               <!--  -->
               <div v-if="index <= step - 1 && item.approvalStatus">
-                <p  :class="[
+                <p :class="[
                 { statusYes: item.approvalStatus == 1 },
-                { statusNo: item.approvalStatus == 2 }, 
-                { statusWait: item.approvalStatus == 0 }, 
+                { statusNo: item.approvalStatus == 2 },
+                { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
                   ({{ item.approvalStatus | statusFormat }})
@@ -69,8 +69,11 @@
             <!-- 只初始化当前流程的教师列表 (index === step - 1) -->
             <!-- 对于学生只初始化第一步 (index = 0) -->
             <!-- 若存在流程状态属性则不初始化 (approvalStatus)-->
-            <el-select class="zjy-select" v-model="value" placeholder="请选择审批人" slot="custom" slot-scope="props" ref="sl" @change="handleChange" v-if="props.data.approvalType == 1 && index === 0 && !props.data.approvalStatus">
-              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName" :value="item.teacherId">
+            <el-select class="zjy-select" v-model="value" placeholder="请选择审批人" slot="custom" slot-scope="props" ref="sl"
+                       @change="handleChange"
+                       v-if="props.data.approvalType == 1 && index === 0 && !props.data.approvalStatus">
+              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
+                         :value="item.teacherId">
               </el-option>
             </el-select>
           </zjy-step>
@@ -78,7 +81,8 @@
       </div>
 
       <div class="zjy-btn-group">
-        <zjy-button v-if="!isCompleted" :type="reissued.stuidcardUid ? 'plain' : 'primary'" :disabled="!!reissued.stuidcardUid" @click="submit">
+        <zjy-button v-if="!isCompleted" :type="reissued.stuidcardUid ? 'plain' : 'primary'"
+                    :disabled="!!reissued.stuidcardUid" @click="submit">
           <template v-if="reissued.stuidcardUid">申请审核中</template>
           <template v-else>申请</template>
         </zjy-button>
@@ -97,12 +101,12 @@ import axios from 'axios'
 import cardAPI from '@/api/student/stuidcard'
 import ZjyInput from '@/components/input'
 import ZjyButton from '@/components/button'
-import { ZjyStep, ZjySteps } from '@/components/steps'
+import {ZjyStep, ZjySteps} from '@/components/steps'
 
-import { getPermissionId } from '@/utils'
+import {getPermissionId} from '@/utils'
 
 export default {
-  data() {
+  data () {
     return {
       reissued: {}, // 补办信息
       student: {}, // 学生信息
@@ -120,7 +124,7 @@ export default {
   },
 
   methods: {
-    submit() {
+    submit () {
       if (!this.reissued.applyReason) {
         this.$alert('请填写申请原因')
         return
@@ -132,13 +136,11 @@ export default {
 
       this.fullscreenLoading = true
 
-
       const _ = this.steps.find(x => x.approvalStep == this.step)
       if (_ && _.approvalType == 1) {
         _.teacherId = this.nextTeacherId
         _.teacherName = this.nextTeacherName
       }
-
 
       cardAPI
         .create(this.reissued, this.steps)
@@ -155,7 +157,7 @@ export default {
         })
     },
 
-    reSubmit() {
+    reSubmit () {
       this.isReapplyed = true
       this.clear()
       this.reissued = {
@@ -171,23 +173,23 @@ export default {
           )
           this.step = 1
           this.approverList =
-            response.data[
-              Object.keys(response.data).filter(x => Number(x) == x)
-            ]
+              response.data[
+                Object.keys(response.data).filter(x => Number(x) == x)
+              ]
         })
         .catch(error => {
           console.log(error)
         })
     },
 
-    clear() {
+    clear () {
       this.reissued = {}
       this.step = 1
       this.value = ''
       this.isCompleted = false
     },
 
-    refresh() {
+    refresh () {
       cardAPI
         .queryReissued()
         .then(response => {
@@ -210,30 +212,32 @@ export default {
                 const _ = this.steps.find(x => x.approvalStatus == 2)
                 if (_) {
                   this.step = _.approvalStep
-                  this.isCompleted = true
-                  return
+                } else {
+                  this.step = this.steps.length + 1
                 }
-                this.step = this.steps.length + 1
+                this.isCompleted = true
               }
               this.isCompleted =
-                this.steps.every(
-                  x => x.approvalStatus && x.approvalStatus == 1
-                ) ||
-                this.steps.some(x => x.approvalStatus && x.approvalStatus == 2)
+                  this.steps.every(
+                    x => x.approvalStatus && x.approvalStatus == 1
+                  ) ||
+                  this.steps.some(x => x.approvalStatus && x.approvalStatus == 2)
             })
-            .catch(error => {})
+            .catch(error => {
+            })
         })
         .catch(error => {
           console.log(error)
         })
     },
 
-    handleChange(val) {
+    handleChange (val) {
       this.nextTeacherId = val
-      if (!this.$empty(this.approverList))
+      if (!this.$empty(this.approverList)) {
         this.nextTeacherName = this.approverList.find(
           x => x.teacherId === val
         ).teacherName
+      }
     }
   },
 
@@ -246,7 +250,7 @@ export default {
     ZjySteps
   },
 
-  created() {
+  created () {
     this.fullscreenLoading = true
     cardAPI
       .queryReissued()
@@ -276,9 +280,9 @@ export default {
 
               // 如果第一步是职务则初始化教师信息
               this.approverList =
-                response.data[
-                  Object.keys(response.data).filter(x => Number(x) == x)
-                ]
+                  response.data[
+                    Object.keys(response.data).filter(x => Number(x) == x)
+                  ]
               this.isCompleted = false
             })
             .catch(error => {
@@ -305,18 +309,17 @@ export default {
                 const _ = this.steps.find(x => x.approvalStatus == 2)
                 if (_) {
                   this.step = _.approvalStep
-                  this.isCompleted = true
-                  return
-                }
-                this.step = this.steps.length + 1
+                } else { this.step = this.steps.length + 1 }
+                this.isCompleted = true
               }
               this.isCompleted =
-                this.steps.every(
-                  x => x.approvalStatus && x.approvalStatus == 1
-                ) ||
-                this.steps.some(x => x.approvalStatus && x.approvalStatus == 2)
+                  this.steps.every(
+                    x => x.approvalStatus && x.approvalStatus == 1
+                  ) ||
+                  this.steps.some(x => x.approvalStatus && x.approvalStatus == 2)
             })
-            .catch(error => {})
+            .catch(error => {
+            })
         }
       })
       .catch(error => {
@@ -329,86 +332,87 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
-.stuidcard {
-  font-size: 12px;
-  color: #333333;
-  padding: 20px;
-}
-.zjy-form {
-  .form-item {
-    margin-right: 30px;
-    margin-bottom: 10px;
-    > span {
-      width: 60px;
-      display: inline-block;
-      text-align: right;
-    }
-    &.block {
-      display: block;
-      span {
-        margin-bottom: 10px;
-      }
-      .zjy-textarea {
-        margin-left: 10px;
-        height: 110px;
-      }
-    }
-  }
-  .zjy-input {
-    width: 180px;
+  .stuidcard {
     font-size: 12px;
+    color: #333333;
+    padding: 20px;
   }
-}
 
-.zjy-steps {
-  width: 1129px;
-  overflow: auto;
-  margin-top: 20px;
-  padding-bottom: 10px;
-  p {
-    margin-left: 10px;
-    margin-bottom: 10px;
+  .zjy-form {
+    .form-item {
+      margin-right: 30px;
+      margin-bottom: 10px;
+      > span {
+        width: 60px;
+        display: inline-block;
+        text-align: right;
+      }
+      &.block {
+        display: block;
+        span {
+          margin-bottom: 10px;
+        }
+        .zjy-textarea {
+          margin-left: 10px;
+          height: 110px;
+        }
+      }
+    }
+    .zjy-input {
+      width: 180px;
+      font-size: 12px;
+    }
   }
-}
 
-.zjy-btn-group {
-  padding: 50px 0;
-  text-align: center;
-}
-.el-select.zjy-select {
-  .el-input__inner,
-  .el-input__inner:focus {
-    border-color: #ed7734 !important;
+  .zjy-steps {
+    width: 1129px;
+    overflow: auto;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    p {
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
+
+  .zjy-btn-group {
+    padding: 50px 0;
+    text-align: center;
+  }
+
+  .el-select.zjy-select {
+    .el-input__inner,
+    .el-input__inner:focus {
+      border-color: #ed7734 !important;
+      color: #ed7734;
+      // width: 140px;
+    }
+  }
+
+  .el-select .el-input .el-select__caret {
     color: #ed7734;
-    // width: 140px;
   }
-}
 
-.el-select .el-input .el-select__caret {
-  color: #ed7734;
-}
+  .el-select-dropdown.el-popper {
+    .el-select-dropdown__item {
+      font-size: 12px;
+      height: 24px;
+      line-height: 24px;
 
-.el-select-dropdown.el-popper {
-  .el-select-dropdown__item {
-    font-size: 12px;
-    height: 24px;
-    line-height: 24px;
+      &.selected {
+        color: #37c6d4;
+      }
+    }
 
-    &.selected {
-      color: #37c6d4;
+    .el-select-dropdown__item span {
+      line-height: 24px !important;
     }
   }
 
-  .el-select-dropdown__item span {
-    line-height: 24px !important;
+  .el-step__title {
+    font-size: 16px;
+    line-height: 24px;
+    margin: 5px 0 0 0;
   }
-}
-
-
-.el-step__title {
-  font-size: 16px;
-  line-height: 24px;
-  margin: 5px 0 0 0;
-}
 
 </style>

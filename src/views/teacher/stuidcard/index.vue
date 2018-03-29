@@ -80,29 +80,29 @@
 </template>
 
 <script>
-import cardAPI from "@/api/teacher/stuidcard"
-import ZjyPagination from "@/components/pagination"
-import ZjyApproval from "./Approval"
-import ZjyInput from "@/components/input"
+import cardAPI from '@/api/teacher/stuidcard'
+import ZjyPagination from '@/components/pagination'
+import ZjyApproval from './Approval'
+import ZjyInput from '@/components/input'
 
 export default {
-  data() {
+  data () {
     return {
       list: [],
-      //limit: 1, // 测试分页
+      // limit: 1, // 测试分页
       total: 0,
       currentPage: 1,
       visible: false,
-      uid: "", // 当前查看补办信息的id
+      uid: '', // 当前查看补办信息的id
       query: {
         offset: 0,
         limit: 10,
-        dataStatus: "", //0:待审批, 1:已通过, 2:已拒绝, 3:审批中
-        enterYear: "",
-        studentCode: ""
+        dataStatus: '', // 0:待审批, 1:已通过, 2:已拒绝, 3:审批中
+        enterYear: '',
+        studentCode: ''
       },
       loading: true,
-      empty: "数据加载中....",
+      empty: '数据加载中....',
       selectedRows: [],
       years: [
         {
@@ -117,20 +117,20 @@ export default {
 
       status: [
         {
-          label: "待审批",
+          label: '待审批',
           value: 0
         },
 
         {
-          label: "已通过",
+          label: '已通过',
           value: 1
         },
         {
-          label: "已拒绝",
+          label: '已拒绝',
           value: 2
         },
         {
-          label: "审批中",
+          label: '审批中',
           value: 3
         }
       ]
@@ -138,16 +138,16 @@ export default {
   },
 
   methods: {
-    view(row) {
+    view (row) {
       this.uid = row.stuidcardUid
       this.visible = true
     },
 
-    handleSelectionChange(rows) {
+    handleSelectionChange (rows) {
       this.selectedRows = rows
     },
 
-    handleClick() {
+    handleClick () {
       this.loading = true
       this.query.offset = this.query.limit * (this.currentPage - 1)
       cardAPI
@@ -163,7 +163,7 @@ export default {
     },
 
     // approval组件提交请求后关闭弹窗
-    handleSubmit(error) {
+    handleSubmit (error) {
       this.visible = false
       // 如果是正常提交数据则需要刷新
       if (!error) {
@@ -173,15 +173,15 @@ export default {
       }
     },
 
-    batchRemove() {
+    batchRemove () {
       if (this.selectedRows.length === 0) return
-      let ids = ""
+      let ids = ''
       this.selectedRows.forEach(x => {
-        ids += "-" + x.studentId + "-"
+        ids += '-' + x.studentId + '-'
       })
       this.loading = true
       cardAPI
-        .batchRemove(ids.replace(/^-|-$/g, ""))
+        .batchRemove(ids.replace(/^-|-$/g, ''))
         .then(response => {
           this.loading = false
           this.refresh()
@@ -189,7 +189,7 @@ export default {
         .catch(error => {})
     },
 
-    del(row) {
+    del (row) {
       this.loading = true
       cardAPI
         .batchRemove(row.studentId)
@@ -200,21 +200,21 @@ export default {
         .catch(error => {})
     },
 
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    rowStyle({ row, rowIndex }) {
+    rowStyle ({ row, rowIndex }) {
       return {
-        textAlign: "center"
+        textAlign: 'center'
       }
     },
 
-    statusFormat(row, column, cellValue) {
-      return ["待审批", "已通过", "已拒绝", "审批中"][+cellValue]
+    statusFormat (row, column, cellValue) {
+      return ['待审批', '已通过', '已拒绝', '审批中'][+cellValue]
     },
 
-    refresh() {
+    refresh () {
       this.loading = true
       this.query.offset = this.query.limit * (this.currentPage - 1)
       cardAPI
@@ -239,7 +239,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
         this.query.offset = this.query.limit * (val - 1)
         cardAPI
@@ -259,12 +259,12 @@ export default {
       }
     },
 
-    visible(val) {
-      if (!val) this.uid = ""
+    visible (val) {
+      if (!val) this.uid = ''
     },
 
-    list(val, oldVal) {
-      this.empty = val.length === 0 ? "暂无数据" : "数据加载中...."
+    list (val, oldVal) {
+      this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     }
   }
 }

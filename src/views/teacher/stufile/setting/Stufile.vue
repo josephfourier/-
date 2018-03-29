@@ -22,9 +22,9 @@ export default {
   data () {
     var that = this
     var checkExists = (rule, value, callback) => {
-      if(that.list.filter(x => x.stufilesettingUid !== that.formData.stufilesettingUid).find(y => y.stufileName == value)) {
+      if (that.list.filter(x => x.stufilesettingUid !== that.formData.stufilesettingUid).find(y => y.stufileName == value)) {
         callback(new Error('档案名称已存在'))
-      } else callback()    
+      } else callback()
     }
     return {
       rules: {
@@ -39,31 +39,32 @@ export default {
   props: {
     formData: Object,
     type: Number,
-    list: Array, // 因为无分页所以检查重复可以直接在前端做
+    list: Array // 因为无分页所以检查重复可以直接在前端做
     // closed: Boolean
   },
 
   methods: {
-    resetForm(formName) {
+    resetForm (formName) {
       this.$refs[formName].resetFields()
       this.$emit('close', 0)
     },
 
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.type === 1)
+          if (this.type === 1) {
             stufileAPI.update(this.formData.stufilesettingUid, this.formData).then(response => {
               if (response.code === 1) {
                 this.$emit('close', 1)
               }
             })
-          else
+          } else {
             stufileAPI.create(this.formData).then(response => {
               if (response.code === 1) {
                 this.$emit('close', 1)
               }
             })
+          }
         } else {
           return false
         }

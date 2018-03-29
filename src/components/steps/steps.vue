@@ -33,33 +33,33 @@ export default {
     }
   },
 
-  data() {
+  data () {
     return {
       steps: [],
       stepOffset: 0
-    };
+    }
   },
 
   methods: {
-    getMigratingConfig() {
+    getMigratingConfig () {
       return {
         props: {
           'center': 'center is removed.'
         }
-      };
+      }
     }
   },
 
   watch: {
-    active(newVal, oldVal) {
-      this.$emit('change', newVal, oldVal);
+    active (newVal, oldVal) {
+      this.$emit('change', newVal, oldVal)
     },
 
-    steps(steps) {
+    steps (steps) {
       steps.forEach((child, index) => {
-        child.index = index;
-      });
+        child.index = index
+      })
     }
   }
-};
+}
 </script>

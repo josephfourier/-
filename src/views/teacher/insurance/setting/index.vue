@@ -16,13 +16,13 @@
           </div>
         </div>
       </div>
-      <el-table 
-        @selection-change="handleSelectionChange" 
-        :data="insuranceList" 
-        style="width: 100%" 
-        :row-style="rowStyle" 
-        :header-row-style="rowStyle" 
-        :header-cell-style="rowStyle" 
+      <el-table
+        @selection-change="handleSelectionChange"
+        :data="insuranceList"
+        style="width: 100%"
+        :row-style="rowStyle"
+        :header-row-style="rowStyle"
+        :header-cell-style="rowStyle"
         v-loading="loading"
       >
         <el-table-column type="selection" width="30">
@@ -66,13 +66,13 @@
     <el-dialog :title="title" :visible.sync="visible" width="800px" @close="handleClose">
       <insurance-setting
         v-if="visible"
-        :formData="setting" 
-        :type="type" 
+        :formData="setting"
+        :type="type"
         @closed="handleInnerClose"
       >
       </insurance-setting>
     </el-dialog>
-   
+
   </div>
 </template>
 
@@ -82,7 +82,7 @@ import InsuranceSetting from './InsuranceSetting'
 import ZjyPagination from '@/components/pagination'
 
 export default {
-  data() {
+  data () {
     return {
       insuranceList: [],
       currentPage: 1,
@@ -99,12 +99,13 @@ export default {
       setting: {
         isOpen: '1',
         isPay: '1'
-      } // 新增投保设置
+      }, // 新增投保设置
+      selectedRows: []
     }
   },
 
   methods: {
-    create() {
+    create () {
       this.setting = {
         isOpen: '1',
         isPay: '1'
@@ -114,7 +115,7 @@ export default {
       this.visible = true
     },
 
-    edit(row) {
+    edit (row) {
       this.title = '编辑保险'
       this.type = 1
       this.visible = true
@@ -123,44 +124,66 @@ export default {
         .then(response => {
           this.setting = response.data
         })
-        .catch(error => {})
+        .catch(error => {
+        })
     },
 
-    _delete(row) {
+    _delete (row) {
       insuranceAPI
         .delete(row.inssettingUid)
         .then(response => {
-          this.refresh()
+          if (response.code !== 1) {
+            this.$alert(response.message)
+          } else { this.refresh() }
         })
-        .catch(error => {})
+        .catch(error => {
+        })
     },
 
-    handleClose() {
+    handleClose () {
       this.visible = false
     },
 
-    handleInnerClose() {
+    handleInnerClose () {
       this.visible = false
       this.refresh()
     },
 
-    batchRemove() {},
+    batchRemove () {
+      let ids = ''
+      this.selectedRows.forEach(x => {
+        console.log(x)
+        ids += '-' + x.inssettingUid + '-'
+      })
 
-    handleSelectionChange(rows) {
+      this.loading = true
+      insuranceAPI.batchRemove(ids.replace(/^-|-$/g, '')).then(response => {
+        if (response.code !== 1) {
+          this.$alert(response.message)
+        } else {
+          this.refresh()
+        }
+        this.loading = false
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+
+    handleSelectionChange (rows) {
       this.selectedRows = rows
     },
 
-    rowStyle({ row, rowIndex }) {
+    rowStyle ({row, rowIndex}) {
       return {
         textAlign: 'center'
       }
     },
 
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    refresh() {
+    refresh () {
       const old = this.currentPage
       this.currentPage = -1
       setTimeout(() => {
@@ -177,7 +200,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
 
         this.loading = true
@@ -195,7 +218,7 @@ export default {
       }
     },
 
-    insuranceList(val) {
+    insuranceList (val) {
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     }
   }

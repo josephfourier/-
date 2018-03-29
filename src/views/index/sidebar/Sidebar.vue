@@ -4,14 +4,14 @@
     <div class="logo">
       <img src="./logo.png" alt="职教云logo">
     </div>
-    <el-menu 
-      :default-active="$route.path" 
-      class="zjy-el-menu" 
+    <el-menu
+      :default-active="$route.path"
+      class="zjy-el-menu"
       @open="handleOpen"
-      @close="handleClose" 
-      text-color="#bdbfc7" 
-      active-text-color="#fff" 
-      :unique-opened=true 
+      @close="handleClose"
+      text-color="#bdbfc7"
+      active-text-color="#fff"
+      :unique-opened=true
       :collapse="isCollapse">
       <el-submenu v-for="item in multi" :index="item.name" :key="item.name">
         <template slot="title">
@@ -39,39 +39,39 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {}
   },
 
   props: {
     routes: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     }
   },
 
-   computed: {
-    isCollapse() {
+  computed: {
+    isCollapse () {
     },
-    multi() {
+    multi () {
       return this.routes.filter(
         item => !item.hidden && item.children.length > 1
       )
     },
-    single() {
+    single () {
       return this.routes.filter(
         item => !item.hidden && item.children.length == 1
       )
     }
   },
   methods: {
-    handleOpen(key, keyPath) {
+    handleOpen (key, keyPath) {
     },
-    handleClose(key, keyPath) {
+    handleClose (key, keyPath) {
     }
-  },
+  }
 }
 </script>
 <style lang='scss' scoped>

@@ -12,14 +12,14 @@
 
 </template>
 <script>
-import ZjyButton from "@/components/button"
+import ZjyButton from '@/components/button'
 
 export default {
   methods: {
-    index() {
+    index () {
       this.$router.push({ path: '/home' })
     },
-    back() {
+    back () {
       this.$router.back()
     }
   },

@@ -1,4 +1,4 @@
-<!-- 
+<!--
 1、若有多个子菜单，点击父菜单则默认显示第一个子菜单
  -->
 <template>
@@ -19,23 +19,23 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       breadcrumbList: null
     }
   },
   watch: {
-    $route() {
+    $route () {
       this.updateBreadcrumb()
     }
   },
   methods: {
-    updateBreadcrumb() {
+    updateBreadcrumb () {
       const matched = this.$route.matched.filter(item => item.name)
       this.breadcrumbList = matched
     }
   },
-  created() {
+  created () {
     this.updateBreadcrumb()
   }
 }

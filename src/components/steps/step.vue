@@ -66,117 +66,117 @@ export default {
     custom: Object
   },
 
-  data() {
+  data () {
     return {
       index: -1,
       lineStyle: {},
       internalStatus: ''
-    };
+    }
   },
 
-  beforeCreate() {
-    this.$parent.steps.push(this);
+  beforeCreate () {
+    this.$parent.steps.push(this)
   },
 
-  beforeDestroy() {
-    const steps = this.$parent.steps;
-    const index = steps.indexOf(this);
+  beforeDestroy () {
+    const steps = this.$parent.steps
+    const index = steps.indexOf(this)
     if (index >= 0) {
-      steps.splice(index, 1);
+      steps.splice(index, 1)
     }
   },
 
   computed: {
-    currentStatus() {
-      return this.status || this.internalStatus;
+    currentStatus () {
+      return this.status || this.internalStatus
     },
-    prevStatus() {
-      const prevStep = this.$parent.steps[this.index - 1];
-      return prevStep ? prevStep.currentStatus : 'wait';
+    prevStatus () {
+      const prevStep = this.$parent.steps[this.index - 1]
+      return prevStep ? prevStep.currentStatus : 'wait'
     },
-    isCenter() {
-      return this.$parent.alignCenter;
+    isCenter () {
+      return this.$parent.alignCenter
     },
-    isVertical() {
-      return this.$parent.direction === 'vertical';
+    isVertical () {
+      return this.$parent.direction === 'vertical'
     },
-    isSimple() {
-      return this.$parent.simple;
+    isSimple () {
+      return this.$parent.simple
     },
-    isLast() {
-      const parent = this.$parent;
-      return parent.steps[parent.steps.length - 1] === this;
+    isLast () {
+      const parent = this.$parent
+      return parent.steps[parent.steps.length - 1] === this
     },
-    stepsCount() {
-      return this.$parent.steps.length;
+    stepsCount () {
+      return this.$parent.steps.length
     },
-    space() {
-      const { isSimple, $parent: { space } } = this;
-      return isSimple ? '' : space ;
+    space () {
+      const { isSimple, $parent: { space } } = this
+      return isSimple ? '' : space
     },
-    style: function() {
-      const style = {};
-      const parent = this.$parent;
-      const len = parent.steps.length;
+    style: function () {
+      const style = {}
+      const parent = this.$parent
+      const len = parent.steps.length
 
       const space = (typeof this.space === 'number'
         ? this.space + 'px'
         : this.space
           ? this.space
-          : 100 / (len - 1) + '%');
-      style.flexBasis = space;
-      if (this.isVertical) return style;
+          : 100 / (len - 1) + '%')
+      style.flexBasis = space
+      if (this.isVertical) return style
       if (this.isLast) {
-        style.maxWidth = 100 / this.stepsCount + '%';
+        style.maxWidth = 100 / this.stepsCount + '%'
       } else {
-        style.marginRight = -this.$parent.stepOffset + 'px';
+        style.marginRight = -this.$parent.stepOffset + 'px'
       }
 
-      return style;
+      return style
     }
   },
 
   methods: {
-    updateStatus(val) {
-      const prevChild = this.$parent.$children[this.index - 1];
+    updateStatus (val) {
+      const prevChild = this.$parent.$children[this.index - 1]
 
       if (val > this.index) {
-        this.internalStatus = this.$parent.finishStatus;
+        this.internalStatus = this.$parent.finishStatus
       } else if (val === this.index && this.prevStatus !== 'error') {
-        this.internalStatus = this.$parent.processStatus;
+        this.internalStatus = this.$parent.processStatus
       } else {
-        this.internalStatus = 'wait';
+        this.internalStatus = 'wait'
       }
 
-      if (prevChild) prevChild.calcProgress(this.internalStatus);
+      if (prevChild) prevChild.calcProgress(this.internalStatus)
     },
 
-    calcProgress(status) {
-      let step = 100;
-      const style = {};
+    calcProgress (status) {
+      let step = 100
+      const style = {}
 
-      style.transitionDelay = 150 * this.index + 'ms';
+      style.transitionDelay = 150 * this.index + 'ms'
       if (status === this.$parent.processStatus) {
-        step = this.currentStatus !== 'error' ? 0 : 0;
+        step = this.currentStatus !== 'error' ? 0 : 0
       } else if (status === 'wait') {
-        step = 0;
-        style.transitionDelay = (-150 * this.index) + 'ms';
+        step = 0
+        style.transitionDelay = (-150 * this.index) + 'ms'
       }
 
-      style.borderWidth = step ? '1px' : 0;
+      style.borderWidth = step ? '1px' : 0
       this.$parent.direction === 'vertical'
         ? style.height = step + '%'
-        : style.width = step + '%';
+        : style.width = step + '%'
 
-      this.lineStyle = style;
+      this.lineStyle = style
     }
   },
 
-  mounted() {
+  mounted () {
     const unwatch = this.$watch('index', val => {
-      this.$watch('$parent.active', this.updateStatus, { immediate: true });
-      unwatch();
-    });
+      this.$watch('$parent.active', this.updateStatus, { immediate: true })
+      unwatch()
+    })
   }
-};
+}
 </script>

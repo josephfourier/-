@@ -14,5 +14,13 @@ export default {
       url: '/manage/swmsApproval/' + sid + '/' + did,
       method: 'get'
     })
+  },
+
+  queryFacultyList () {
+    return ajax.get('/manage/insurance/faculty')
+  },
+
+  querySpecialtyByFaculty (code) {
+    return ajax.get('/manage/insurance/specialty/' + code)
   }
 }

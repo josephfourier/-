@@ -39,5 +39,9 @@ export default {
       inssettingUid: arg2,
       swmsApprovalList: arg3
     })
+  },
+
+  batch(arg) {
+    return ajax.post('/manage/insurance/batch', arg)
   }
 }

@@ -56,11 +56,11 @@
             </div>
             <!--  -->
             <div v-if="index <= step - 1 && item.approvalStatus">
-              <p 
+              <p
                 :class="[
                 { statusYes: item.approvalStatus == 1 },
-                { statusNo: item.approvalStatus == 2 }, 
-                { statusWait: item.approvalStatus == 0 }, 
+                { statusNo: item.approvalStatus == 2 },
+                { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
                 ({{ item.approvalStatus | statusFormat }})
@@ -69,8 +69,11 @@
           </div>
           <!-- 只初始化当前流程的教师列表 (index === step - 1) -->
           <!-- 若存在流程状态属性则不初始化 (approvalStatus) -->
-          <el-select class="zjy-select" v-model="value" placeholder="请选择审批人" slot="custom" slot-scope="props" @change="handleChange" v-if="props.data.approvalType == 1 && index === step - 1 && !props.data.approvalStatus && approved && !reason">
-            <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName" :value="item.teacherId">
+          <el-select class="zjy-select" v-model="value" placeholder="请选择审批人" slot="custom" slot-scope="props"
+                     @change="handleChange"
+                     v-if="props.data.approvalType == 1 && index === step - 1 && !props.data.approvalStatus && approved && !reason">
+            <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
+                       :value="item.teacherId">
             </el-option>
           </el-select>
         </zjy-step>
@@ -96,30 +99,30 @@
 </template>
 
 <script>
-import cardAPI from "@/api/teacher/stuidcard"
-import ZjyInput from "@/components/input"
-import { ZjyStep, ZjySteps } from "@/components/steps"
-import ZjyButton from "@/components/button"
+import cardAPI from '@/api/teacher/stuidcard'
+import ZjyInput from '@/components/input'
+import {ZjyStep, ZjySteps} from '@/components/steps'
+import ZjyButton from '@/components/button'
 
-import { mapGetters } from "vuex"
+import {mapGetters} from 'vuex'
 
 // approvalStatus 0:待审批, 1:已通过，2:已拒绝
 const STATUS = {
-  awaiting: "0",
-  yes: "1",
-  no: "2"
+  awaiting: '0',
+  yes: '1',
+  no: '2'
 }
 export default {
-  data() {
+  data () {
     return {
       reissued: {},
       student: {},
       steps: [],
-      value: "",
-      reason: "", // 拒绝原因
+      value: '',
+      reason: '', // 拒绝原因
       currentStep: {},
-      nextTeacherId: "",
-      nextTeacherName: "",
+      nextTeacherId: '',
+      nextTeacherName: '',
       isCompleted: true, // 是否已完成所有审批
       innerVisible: false,
       approved: false, // 是否已处理申请
@@ -130,23 +133,23 @@ export default {
   },
 
   methods: {
-    no() {
+    no () {
       this.innerVisible = true
     },
 
-    yes() {
+    yes () {
       this.steps[this.step - 1].approvalStatus = STATUS.yes
       this.approved = true
     },
 
-    innerNo() {
+    innerNo () {
       this.innerVisible = false
       this.reason = ''
     },
 
-    innerYes() {
+    innerYes () {
       if (!this.reason) {
-        this.$alert("请输入拒绝原因")
+        this.$alert('请输入拒绝原因')
         return
       }
       this.steps[this.step - 1].approvalStatus = STATUS.no
@@ -154,9 +157,9 @@ export default {
       this.innerVisible = false
     },
 
-    submit() {
+    submit () {
       if (!this.value && !this.$empty(this.approverList) && !this.reason) {
-        this.$alert("请选择下一步审批人")
+        this.$alert('请选择下一步审批人')
         return
       }
 
@@ -174,29 +177,31 @@ export default {
         .approved(this.reissued, this.steps)
         .then(response => {
           if (response.code === 1) {
-            this.$alert("保存成功")
-            this.$emit("submit", 0)
+            this.$alert('保存成功')
+            this.$emit('submit', 0)
           } else {
-            this.$alert("保存失败")
-            this.$emit("submit", 1)
+            this.$alert('保存失败')
+            this.$emit('submit', 1)
           }
         })
-        .catch(error => {})
+        .catch(error => {
+        })
     },
     // 关闭时清空各个状态
-    clear() {
+    clear () {
       this.approved = false
-      this.value = ""
+      this.value = ''
       this.isCompleted = true
-      this.reason = ""
+      this.reason = ''
     },
 
-    handleChange(val) {
+    handleChange (val) {
       this.nextTeacherId = val
-      if (!this.$empty(this.approverList))
+      if (!this.$empty(this.approverList)) {
         this.nextTeacherName = this.approverList.find(
           x => x.teacherId === val
         ).teacherName
+      }
     }
   },
 
@@ -206,7 +211,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["user"])
+    ...mapGetters(['user'])
   },
 
   components: {
@@ -218,9 +223,9 @@ export default {
   watch: {
     uid: {
       immediate: true,
-      handler(val) {
+      handler (val) {
         this.loading = true
-        if (val == "") return
+        if (val == '') return
         cardAPI
           .queryForObject(val)
           .then(response => {
@@ -235,14 +240,14 @@ export default {
             }
             this.loading = false
           })
-          .catch(error => {})
+          .catch(error => {
+          })
       }
     },
     // 查询流程进度
     student: {
       deep: true,
-      handler(val) {
-        
+      handler (val) {
         cardAPI
           .queryApprovalProcess(this.student.studentId, this.uid)
           .then(response => {
@@ -262,14 +267,12 @@ export default {
               if (_) {
                 this.step = _.approvalStep
                 this.reason = _.approvalOpinion
-                this.isCompleted = true
-                return
+              } else {
+                this.step = this.steps.length + 1
               }
 
               this.isCompleted = true
-              this.step = this.steps.length + 1
             }
-
 
             // 下一步需要设置教师则初始化
             this.approverList = response.data[Object.keys(response.data).filter(x => Number(x) == x)]
@@ -284,12 +287,12 @@ export default {
       }
     },
 
-    approved(val) {
+    approved (val) {
       if (val) this.step++
       else this.step--
     },
 
-    closed(val) {
+    closed (val) {
       if (val) {
         this.clear()
       }
@@ -298,36 +301,39 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
-.form-item {
-  font-size: 14px;
-  margin-bottom: 20px;
-  margin-right: 20px;
-  > span:nth-child(1) {
-    color: #666;
+  .form-item {
+    font-size: 14px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    > span:nth-child(1) {
+      color: #666;
+    }
+    > span:nth-child(2) {
+      color: #323232;
+    }
   }
-  > span:nth-child(2) {
-    color: #323232;
+
+  .reason {
+    margin-bottom: 10px;
+
   }
-}
-.reason {
-  margin-bottom: 10px;
- 
-}
+
   .title {
     font-weight: bold;
   }
-.refused {
-  height: 54px;
-  background-color: #f5f5f5;
-  font-size: 14px;
-  color: #333333;
-  line-height: 54px;
-  text-indent: 15px;
-  margin: 30px 0 15px 0;
-   font-weight: bold;
-}
-.zjy-textarea {
-  height: 100px;
-}
-</style>
 
+  .refused {
+    height: 54px;
+    background-color: #f5f5f5;
+    font-size: 14px;
+    color: #333333;
+    line-height: 54px;
+    text-indent: 15px;
+    margin: 30px 0 15px 0;
+    font-weight: bold;
+  }
+
+  .zjy-textarea {
+    height: 100px;
+  }
+</style>

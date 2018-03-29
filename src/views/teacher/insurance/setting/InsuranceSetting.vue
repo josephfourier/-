@@ -47,7 +47,7 @@ import insuranceAPI from '@/api/teacher/insurance/setting'
 import ZjyButton from '@/components/button'
 
 export default {
-  data() {
+  data () {
     var isNumber = (rule, value, callback) => {
       if (!/^[0-9]+$/.test(value)) {
         return callback(new Error('请输入正数'))
@@ -55,7 +55,7 @@ export default {
       callback()
     }
     return {
-     
+
       rules: {
         insuranceName: [
           { required: true, message: '请输入保险名称', trigger: 'blur' }
@@ -85,21 +85,22 @@ export default {
   },
 
   methods: {
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.type === 1)
+          if (this.type === 1) {
             insuranceAPI.update(this.formData.inssettingUid, this.formData).then(response => {
               if (response.code === 1) {
                 this.$emit('closed', 1)
               }
             })
-          else
+          } else {
             insuranceAPI.create(this.formData).then(response => {
               if (response.code === 1) {
                 this.$emit('closed', 1)
               }
             })
+          }
         } else {
           return false
         }

@@ -1,11 +1,11 @@
 <script>
-import UploadList from './upload-list';
-import Upload from './upload';
-import IframeUpload from './iframe-upload';
-import ElProgress from 'element-ui/packages/progress';
+import UploadList from './upload-list'
+import Upload from './upload'
+import IframeUpload from './iframe-upload'
+import ElProgress from 'element-ui/packages/progress'
 // import Migrating from 'element-ui/src/mixins/migrating';
 
-function noop() {}
+function noop () {}
 
 export default {
   name: 'ElUpload',
@@ -36,8 +36,8 @@ export default {
     },
     headers: {
       type: Object,
-      default() {
-        return {};
+      default () {
+        return {}
       }
     },
     data: Object,
@@ -85,8 +85,8 @@ export default {
     },
     fileList: {
       type: Array,
-      default() {
-        return [];
+      default () {
+        return []
       }
     },
     autoUpload: {
@@ -106,37 +106,37 @@ export default {
     }
   },
 
-  data() {
+  data () {
     return {
       uploadFiles: [],
       dragOver: false,
       draging: false,
       tempIndex: 1
-    };
+    }
   },
 
   computed: {
-    uploadDisabled() {
-      return this.disabled || (this.elForm || {}).disabled;
+    uploadDisabled () {
+      return this.disabled || (this.elForm || {}).disabled
     }
   },
 
   watch: {
     fileList: {
       immediate: true,
-      handler(fileList) {
+      handler (fileList) {
         this.uploadFiles = fileList.map(item => {
-          item.uid = item.uid || (Date.now() + this.tempIndex++);
-          item.status = item.status || 'success';
-          return item;
-        });
+          item.uid = item.uid || (Date.now() + this.tempIndex++)
+          item.status = item.status || 'success'
+          return item
+        })
       }
     }
   },
 
   methods: {
-    handleStart(rawFile) {
-      rawFile.uid = Date.now() + this.tempIndex++;
+    handleStart (rawFile) {
+      rawFile.uid = Date.now() + this.tempIndex++
       let file = {
         status: 'ready',
         name: rawFile.name,
@@ -144,105 +144,105 @@ export default {
         percentage: 0,
         uid: rawFile.uid,
         raw: rawFile
-      };
+      }
 
       try {
-        file.url = URL.createObjectURL(rawFile);
+        file.url = URL.createObjectURL(rawFile)
       } catch (err) {
-        console.error(err);
-        return;
+        console.error(err)
+        return
       }
 
-      this.uploadFiles.push(file);
-      this.onChange(file, this.uploadFiles);
+      this.uploadFiles.push(file)
+      this.onChange(file, this.uploadFiles)
     },
-    handleProgress(ev, rawFile) {
-      const file = this.getFile(rawFile);
-      this.onProgress(ev, file, this.uploadFiles);
-      file.status = 'uploading';
-      file.percentage = ev.percent || 0;
+    handleProgress (ev, rawFile) {
+      const file = this.getFile(rawFile)
+      this.onProgress(ev, file, this.uploadFiles)
+      file.status = 'uploading'
+      file.percentage = ev.percent || 0
     },
-    handleSuccess(res, rawFile) {
-      const file = this.getFile(rawFile);
+    handleSuccess (res, rawFile) {
+      const file = this.getFile(rawFile)
 
       if (file) {
-        file.status = 'success';
-        file.response = res;
+        file.status = 'success'
+        file.response = res
 
-        this.onSuccess(res, file, this.uploadFiles);
-        this.onChange(file, this.uploadFiles);
+        this.onSuccess(res, file, this.uploadFiles)
+        this.onChange(file, this.uploadFiles)
       }
     },
-    handleError(err, rawFile) {
-      const file = this.getFile(rawFile);
-      const fileList = this.uploadFiles;
+    handleError (err, rawFile) {
+      const file = this.getFile(rawFile)
+      const fileList = this.uploadFiles
 
-      file.status = 'fail';
+      file.status = 'fail'
 
-      fileList.splice(fileList.indexOf(file), 1);
+      fileList.splice(fileList.indexOf(file), 1)
 
-      this.onError(err, file, this.uploadFiles);
-      this.onChange(file, this.uploadFiles);
+      this.onError(err, file, this.uploadFiles)
+      this.onChange(file, this.uploadFiles)
     },
-    handleRemove(file, raw) {
+    handleRemove (file, raw) {
       if (raw) {
-        file = this.getFile(raw);
+        file = this.getFile(raw)
       }
       let doRemove = () => {
-        this.abort(file);
-        let fileList = this.uploadFiles;
-        fileList.splice(fileList.indexOf(file), 1);
-        this.onRemove(file, fileList);
-      };
+        this.abort(file)
+        let fileList = this.uploadFiles
+        fileList.splice(fileList.indexOf(file), 1)
+        this.onRemove(file, fileList)
+      }
 
       if (!this.beforeRemove) {
-        doRemove();
+        doRemove()
       } else if (typeof this.beforeRemove === 'function') {
-        const before = this.beforeRemove(file, this.uploadFiles);
+        const before = this.beforeRemove(file, this.uploadFiles)
         if (before && before.then) {
           before.then(() => {
-            doRemove();
-          }, noop);
+            doRemove()
+          }, noop)
         } else if (before !== false) {
-          doRemove();
+          doRemove()
         }
       }
     },
-    getFile(rawFile) {
-      let fileList = this.uploadFiles;
-      let target;
+    getFile (rawFile) {
+      let fileList = this.uploadFiles
+      let target
       fileList.every(item => {
-        target = rawFile.uid === item.uid ? item : null;
-        return !target;
-      });
-      return target;
+        target = rawFile.uid === item.uid ? item : null
+        return !target
+      })
+      return target
     },
-    abort(file) {
-      this.$refs['upload-inner'].abort(file);
+    abort (file) {
+      this.$refs['upload-inner'].abort(file)
     },
-    clearFiles() {
-      this.uploadFiles = [];
+    clearFiles () {
+      this.uploadFiles = []
     },
-    submit() {
+    submit () {
       this.uploadFiles
         .filter(file => file.status === 'ready')
         .forEach(file => {
-          this.$refs['upload-inner'].upload(file.raw);
-        });
+          this.$refs['upload-inner'].upload(file.raw)
+        })
     },
-    getMigratingConfig() {
+    getMigratingConfig () {
       return {
         props: {
           'default-file-list': 'default-file-list is renamed to file-list.',
           'show-upload-list': 'show-upload-list is renamed to show-file-list.',
           'thumbnail-mode': 'thumbnail-mode has been deprecated, you can implement the same effect according to this case: http://element.eleme.io/#/zh-CN/component/upload#yong-hu-tou-xiang-shang-chuan'
         }
-      };
+      }
     }
   },
 
-  render(h) {
-    let uploadList;
+  render (h) {
+    let uploadList
 
     if (this.showFileList) {
       uploadList = (
@@ -253,7 +253,7 @@ export default {
           on-remove={this.handleRemove}
           handlePreview={this.onPreview}>
         </UploadList>
-      );
+      )
     }
 
     const uploadData = {
@@ -283,12 +283,12 @@ export default {
         'http-request': this.httpRequest
       },
       ref: 'upload-inner'
-    };
+    }
 
-    const trigger = this.$slots.trigger || this.$slots.default;
+    const trigger = this.$slots.trigger || this.$slots.default
     const uploadComponent = (typeof FormData !== 'undefined' || this.$isServer)
       ? <upload {...uploadData}>{trigger}</upload>
-      : <iframeUpload {...uploadData}>{trigger}</iframeUpload>;
+      : <iframeUpload {...uploadData}>{trigger}</iframeUpload>
 
     return (
       <div>
@@ -301,7 +301,7 @@ export default {
         {this.$slots.tip}
         { this.listType !== 'picture-card' ? uploadList : ''}
       </div>
-    );
+    )
   }
-};
+}
 </script>

@@ -22,7 +22,7 @@
           </a>
         </template>
       </el-table-column>
-      
+
       <span slot="empty">{{ empty }}</span>
     </el-table>
     <div class="zjy-pagination" v-if="accountList.length !== 0">
@@ -43,27 +43,25 @@ import ZJYList from '@/components/list'
 
 export default {
   methods: {
-    view(row) {
+    view (row) {
       this.dialogVisible = true
       accountAPI
         .queryPermissionScope(row.teacherLevel, row.departmentId)
         .then(resp => {
           let res = []
-          if (typeof resp.data === 'string')
-            res.push(resp.data)
-          else res = resp.data
+          if (typeof resp.data === 'string') { res.push(resp.data) } else res = resp.data
           this.pemissionScope = res
           this.status = resp.code
           this.message = resp.message
         })
         .catch(err => {})
     },
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     }
   },
 
-  data() {
+  data () {
     return {
       accountList: [],
       // 当前页
@@ -98,7 +96,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         this.loading = true
         accountAPI
           .queryForList((val - 1) * this.limit, this.limit, this.query)
@@ -111,7 +109,7 @@ export default {
       }
     },
 
-    query(val, oldVal) {
+    query (val, oldVal) {
       this.loading = true
       accountAPI
         .queryForList(0, this.limit, val)
@@ -123,7 +121,7 @@ export default {
         .catch(err => {})
     },
 
-    accountList(val, oldVal) {
+    accountList (val, oldVal) {
       if (!val) return
       if (val.length === 0) this.empty = '暂无数据'
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'

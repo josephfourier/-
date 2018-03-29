@@ -146,3 +146,12 @@
 .el-picker-panel.el-date-picker.el-popper {
   // position: absolute !important;
 }
+// 学生档案上传
+#zjy-upload-form {
+  .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left ~ .el-table__fixed {
+    border-right: 0;
+  }
+  .el-progress-bar__inner {
+    background-color: #36c6d3
+  }
+}

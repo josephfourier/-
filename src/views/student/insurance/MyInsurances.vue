@@ -37,7 +37,7 @@
     </div>
 
     <el-dialog title="审批进度" :visible.sync="visible" width="800px">
-      <my-application :data="setting" v-model="value" :closed="!visible" @submit="handleSubmit"></my-application>
+      <my-application :data="setting" v-model="value" v-if="visible" @submit="handleSubmit" @close="visible = false"></my-application>
     </el-dialog>
   </div>
 </template>
@@ -50,7 +50,7 @@ import ZjyPagination from '@/components/pagination'
 import MyApplication from './MyApplication'
 
 export default {
-  data() {
+  data () {
     return {
       setting: {},
       value: {},
@@ -69,19 +69,19 @@ export default {
   },
 
   methods: {
-    statusFormate(row, column, cellValue) {
+    statusFormate (row, column, cellValue) {
       return ['待审批', '已通过', '已拒绝', '审批中', '待确认', '待付款'][+cellValue]
     },
 
-    handleSubmit() {},
+    handleSubmit () {},
 
-    rowStyle({ row, rowIndex }) {
+    rowStyle ({ row, rowIndex }) {
       return {
         textAlign: 'center'
       }
     },
 
-    view(row) {
+    view (row) {
       commonAPI.queryApprovalProcess(row.studentId, row.insuranceUid).then(response => {
         this.setting = row
         this.value = response.data
@@ -89,11 +89,11 @@ export default {
       })
     },
 
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    refresh() {
+    refresh () {
       const old = this.currentPage
       this.currentPage = -1
       setTimeout(() => {
@@ -114,7 +114,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
 
         this.loading = true
@@ -126,17 +126,17 @@ export default {
             this.total = response.total
             this.loading = false
           })
-          .catch(err => {
+          .catch(error => {
             this.loading = false
           })
       }
     },
 
-    list(val) {
+    list (val) {
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     },
 
-    active(val) {
+    active (val) {
       if (val) this.refresh()
     }
   }

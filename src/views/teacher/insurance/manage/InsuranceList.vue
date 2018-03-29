@@ -5,11 +5,23 @@
       <div class="zjy-table-search__item">
         <span>保单状态</span>
         <el-select v-model="query.dataStatus" placeholder="请选择">
+          <el-option
+            v-for="item in optionsStauts"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
         </el-select>
       </div>
       <div class="zjy-table-search__item">
         <span>申请年份</span>
         <el-select v-model="query.appYear" placeholder="请选择">
+          <el-option
+            v-for="item in optionsYear"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
         </el-select>
       </div>
       <div class="zjy-table-search__item">
@@ -64,25 +76,33 @@
     <el-dialog title="保单审批" :visible.sync="visible" width="800px">
       <insurance-process
         v-if="visible"
-        :data="setting" 
+        :data="setting"
         v-model="value"
         @submit="handleSubmit"
       >
       </insurance-process>
     </el-dialog>
+
+    <el-dialog title="批量投保" :visible.sync="visible2" width="800px">
+      <batch-insurance
+        v-if="visible2"
+        @closed="handleClosed2"
+      ></batch-insurance>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import insuranceManageAPI from "@/api/teacher/insurance/manage"
-import commonAPI from "@/api/common"
-import { selfMerge, dateFormat as _dateFormat } from "@/utils"
-import ZjyInput from "@/components/input"
-import ZjyPagination from "@/components/pagination"
-import InsuranceProcess from "./InsuranceProcess"
+import insuranceManageAPI from '@/api/teacher/insurance/manage'
+import commonAPI from '@/api/common'
+import {dateFormat as _dateFormat} from '@/utils'
+import ZjyInput from '@/components/input'
+import ZjyPagination from '@/components/pagination'
+import InsuranceProcess from './InsuranceProcess'
+import BatchInsurance from './BatchInsurance'
 // 审批状态：0-待审批，1-已通过，2-已拒绝，3-审批中，4-待确认，5-待付款
 export default {
-  data() {
+  data () {
     return {
       setting: {}, // 保险设置信息
       value: {}, // 审批流程进度信息
@@ -91,32 +111,75 @@ export default {
       limit: 10,
       total: 0,
       visible: false,
+      visible2: false,
       query: {
         offset: 0,
         limit: 10,
-        dataStatus: "",
-        appYear: "",
-        studentCode: ""
+        dataStatus: '',
+        appYear: '',
+        studentCode: ''
       },
       loading: false,
-      empty: "暂无数据"
+      empty: '暂无数据',
+
+      optionsYear: [
+        {
+          label: '2017年',
+          value: 2017
+        },
+        {
+          label: '2018年',
+          value: 2018
+        }
+      ],
+
+      optionsStauts: [
+        {
+          label: '待审批',
+          value: 0
+        }, {
+          label: '已通过',
+          value: 1
+        }, {
+          label: '已拒绝',
+          value: 2
+
+        }, {
+          label: '审批中',
+          value: 3
+        }, {
+          label: '待确认',
+          value: 4
+        }, {
+          label: '待付款',
+          value: 5
+        }
+      ]
     }
   },
 
   methods: {
-    search() {},
+    search () {
+      this.refresh()
+    },
 
-    currentChange(pageNumber) {
+    handleClosed2 () {
+      this.visible2 = false
+    },
+
+    currentChange (pageNumber) {
       this.currentChange = pageNumber
     },
     // 批量投保
-    batch() {},
+    batch () {
+      this.visible2 = true
+    },
 
-    dateFormat(row, column, cellValue) {
+    dateFormat (row, column, cellValue) {
       return _dateFormat(cellValue)
     },
 
-    handleSubmit(val) {
+    handleSubmit (val) {
       this.visible = false
       // 查看操作时关闭
 
@@ -125,14 +188,12 @@ export default {
       }
     },
 
-    statusFormate(row, column, cellValue) {
-      return ["待审批", "已通过", "已拒绝", "审批中", "待确认", "待付款"][
-        +cellValue
-      ]
+    statusFormate (row, column, cellValue) {
+      return ['待审批', '已通过', '已拒绝', '审批中', '待确认', '待付款'][+cellValue]
     },
 
     // 保单审批
-    view(row) {
+    view (row) {
       console.log(row)
       // insuranceManageAPI.queryForObject(row.insuranceUid).then(response => {
       //   console.log(response)
@@ -146,15 +207,18 @@ export default {
         })
     },
 
-    refresh() {
+    refresh () {
       const old = this.currentPage
       this.currentPage = -1
       setTimeout(() => (this.currentPage = old), 100)
     }
   },
 
-  created() {},
+  created () {
+  },
+
   components: {
+    BatchInsurance,
     ZjyInput,
     ZjyPagination,
     InsuranceProcess
@@ -163,7 +227,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
 
         this.loading = true
@@ -180,15 +244,16 @@ export default {
             }
             this.loading = false
           })
-          .catch(err => {
+          .catch(error => {
+            console.log(error)
             this.loading = false
           })
       }
     },
 
-    list(val) {
+    list (val) {
       if (!val) return
-      this.empty = val.length === 0 ? "暂无数据" : "数据加载中...."
+      this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     }
   }
 }

@@ -16,14 +16,14 @@ export default {
     return {
     }
   },
-  
+
   props: {
     label: String,
     labelWidth: String
   },
 
   computed: {
-    labelStyle() {
+    labelStyle () {
       let ret = {}
       var labelWidth = this.labelWidth
       if (labelWidth) {
@@ -32,7 +32,7 @@ export default {
       return ret
     },
 
-    contentStyle() {
+    contentStyle () {
       let ret = {}
       var labelWidth = this.labelWidth
       if (labelWidth) {

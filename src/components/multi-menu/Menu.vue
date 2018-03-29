@@ -1,26 +1,26 @@
 <template>
   <div>
-    <menu-item 
-      v-bind="$props" 
-      class="main-menu" 
-      :title="titles[0]" 
-      :width="widths[0]" 
-      :filterable="filterable[0]" 
-      :props="props[0]" 
+    <menu-item
+      v-bind="$props"
+      class="main-menu"
+      :title="titles[0]"
+      :width="widths[0]"
+      :filterable="filterable[0]"
+      :props="props[0]"
       :type="types[0]"
       :elt="elts[0]"
       :highlight="highlights[0]"
       :defaultSelected="defaultSelected"
       @selected-change="selectedChange">
     </menu-item>
-    <menu-item 
+    <menu-item
       v-bind="$props"
-      class="sub-menu" 
-      :data="value" 
-      :title="titles[1]" 
-      :width="widths[1]" 
-      :filterable="filterable[1]" 
-      :props="props[1]" 
+      class="sub-menu"
+      :data="value"
+      :title="titles[1]"
+      :width="widths[1]"
+      :filterable="filterable[1]"
+      :props="props[1]"
       :type="types[1]"
       :elt="elts[1]"
       :defaultSelected="defaultSelectedSub"
@@ -67,7 +67,7 @@ import MenuItem from './MenuItem'
 
 export default {
   name: 'MultiMenu',
-  data() {
+  data () {
     return {
     }
   },
@@ -79,52 +79,52 @@ export default {
   props: {
     data: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     },
     value: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     },
     titles: {
       type: Array,
-      default() {
+      default () {
         return ['title1', 'title2']
       }
     },
     widths: {
       type: Array,
-      default() {
+      default () {
         return ['50%', '50%']
       }
     },
-    filterable:Array,
+    filterable: Array,
     props: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     },
     renderContent: Function,
     types: {
       type: Array,
-      default() {
-        return ['ul','ul']
+      default () {
+        return ['ul', 'ul']
       }
     },
     selected: Object,
     elts: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     },
     radioNames: {
-      type:Array,
-      default() {
+      type: Array,
+      default () {
         return ['radio1', 'radio2']
       }
     },
@@ -134,7 +134,7 @@ export default {
 
     highlights: {
       type: Array,
-      default() {
+      default () {
         return [false, false]
       }
     },
@@ -145,25 +145,25 @@ export default {
     loading: Boolean
   },
   methods: {
-    create() {
+    create () {
       this.$emit('create')
     },
-    del(props) {
+    del (props) {
       this.$emit('del', props)
     },
-    config(props) {
+    config (props) {
       this.$emit('config', props)
     },
-    selectedChange(item) {
+    selectedChange (item) {
       this.$emit('selected-change', item)
     },
     // 第二菜单事件
-    selectedChange_(item) {
+    selectedChange_ (item) {
       this.$emit('selected-change_', item)
     }
   },
-  mounted() {
-    
+  mounted () {
+
   }
 }
 </script>

@@ -10,22 +10,22 @@
     }
     ]" @mouseenter="hovering=true" @mouseleave="hovering=false">
     <template v-if="type !== 'textarea'">
-      <input 
-      v-if="type !== 'textarea'" 
-      class="zjy-input__inner" 
-      v-bind="$props" 
-      :autoComplete="autoComplete" 
-      :value="currentValue" 
-      ref="input" @input="handleInput" 
-      @focus="handleFocus" 
-      @blur="handleBlur" 
+      <input
+      v-if="type !== 'textarea'"
+      class="zjy-input__inner"
+      v-bind="$props"
+      :autoComplete="autoComplete"
+      :value="currentValue"
+      ref="input" @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
       @change="handleChange"
       @keyup="handleKeyup">
     </template>
-    <textarea 
+    <textarea
       v-else
       class="zjy-textarea__inner"
-      v-bind="$props" 
+      v-bind="$props"
       :value="currentValue"
       @input="handleInput"
       ref="textarea"
@@ -41,7 +41,7 @@
 export default {
   name: 'ZjyInput',
   componentName: 'ZjyInput',
-  data() {
+  data () {
     return {
       currentValue: this.value,
       prefixOffset: null,
@@ -96,24 +96,24 @@ export default {
   },
 
   computed: {
-    inputSize() {
+    inputSize () {
       return this.size
     }
   },
 
   watch: {
-    value(val, oldValue) {
+    value (val, oldValue) {
       this.setCurrentValue(val)
     }
   },
   methods: {
-    focus() {
+    focus () {
       (this.$refs.input || this.$refs.textarea).focus()
     },
-    handleKeyup() {
-       this.$emit('keyup', event)
+    handleKeyup () {
+      this.$emit('keyup', event)
     },
-    getMigratingConfig() {
+    getMigratingConfig () {
       return {
         props: {
           icon: 'icon is removed, use suffix-icon / prefix-icon instead.',
@@ -124,39 +124,38 @@ export default {
         }
       }
     },
-    handleBlur(event) {
+    handleBlur (event) {
       this.focused = false
       this.$emit('blur', event)
     },
-    inputSelect() {
+    inputSelect () {
       (this.$refs.input || this.$refs.textarea).select()
     },
 
-  
-    handleFocus(event) {
+    handleFocus (event) {
       this.focused = true
       this.$emit('focus', event)
     },
-    handleInput(event) {
+    handleInput (event) {
       const value = event.target.value
       this.$emit('input', value)
       this.setCurrentValue(value)
     },
-    handleChange(event) {
+    handleChange (event) {
       this.$emit('change', event.target.value)
     },
-    setCurrentValue(value) {
+    setCurrentValue (value) {
       if (value === this.currentValue) return
 
       this.currentValue = value
     },
-    calcIconOffset(place) {
+    calcIconOffset (place) {
       const pendantMap = {
         suf: 'append',
         pre: 'prepend'
       }
     },
-    clear() {
+    clear () {
       this.$emit('input', '')
       this.$emit('change', '')
       this.setCurrentValue('')

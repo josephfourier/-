@@ -20,34 +20,34 @@
 
 <script>
 export default {
-  data() {
-    return {};
+  data () {
+    return {}
   },
 
   props: {
     type: {
       type: String,
-      default: "default"
+      default: 'default'
     },
     size: String,
     disabled: Boolean,
     autofocus: Boolean,
     nativeType: {
       type: String,
-      default: "button"
+      default: 'button'
     },
     buttonSize: {
-        type: String,
-        default: 'lg'
+      type: String,
+      default: 'lg'
     }
   },
 
   methods: {
-    handleClick(evt) {
-      this.$emit("click", evt)
+    handleClick (evt) {
+      this.$emit('click', evt)
     },
 
-    handleInnerClick(evt) {
+    handleInnerClick (evt) {
       if (this.disabled) evt.stopPropagation()
     }
   }

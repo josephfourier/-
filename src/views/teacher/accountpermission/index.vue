@@ -2,7 +2,7 @@
     <div class="zjy-app zjy-account">
         <AccountList
         :query="query">
-          <zjy-search 
+          <zjy-search
             class="zjy-table-search"
             :label="'用户姓名'"
             placeholder="请输入姓名"
@@ -13,23 +13,23 @@
     </div>
 </template>
 <script>
-import AccountList from "./AccountList.vue"
+import AccountList from './AccountList.vue'
 import ZjySearch from '@/components/search'
 import ZjyInput from '@/components/input'
 export default {
-  data() {
+  data () {
     return {
-      msg: "table",
+      msg: 'table',
       query: ''
     }
   },
 
   methods: {
-    search(val) {
+    search (val) {
       this.query = val
     },
-    update(val) {
-      //this.query = val
+    update (val) {
+      // this.query = val
     }
   },
 

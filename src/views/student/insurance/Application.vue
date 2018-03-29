@@ -1,15 +1,17 @@
 <!-- 学生查看保险或申请保险（全部保险菜单) -->
 <template>
   <panel>
-    <!-- <div class="status" v-if="type === 2">
-      <img src="./ic_wait.png" alt="确认状态">
-      <span>134134</span>
-    </div> -->
-    <panel-item class="item" label="保险名称：" labelWidth="70px"><p class="text" :title="data.insuranceName">{{ data.insuranceName }}</p></panel-item>
-    <panel-item class="item" label="保险公司：" labelWidth="70px"><p class="text" :title="data.insuranceCompany">{{ data.insuranceCompany }}</p></panel-item>
-    <panel-item class="item" label="险种类别：" labelWidth="70px"><p class="text" :title="data.insuranceCategory">{{ data.insuranceCategory }}</p></panel-item>
-    <panel-item class="item" label="保险费用：" labelWidth="70px"><p class="text" :title="data.insuranceCost">{{ data.insuranceCost }}</p></panel-item>
-    <panel-item class="item" label="保险期限：" labelWidth="70px"><p class="text" :title="data.insuranceLimit">{{ data.insuranceLimit }}</p></panel-item>
+
+    <panel-item class="item" label="保险名称：" labelWidth="70px"><p class="text" :title="data.insuranceName">{{
+      data.insuranceName }}</p></panel-item>
+    <panel-item class="item" label="保险公司：" labelWidth="70px"><p class="text" :title="data.insuranceCompany">{{
+      data.insuranceCompany }}</p></panel-item>
+    <panel-item class="item" label="险种类别：" labelWidth="70px"><p class="text" :title="data.insuranceCategory">{{
+      data.insuranceCategory }}</p></panel-item>
+    <panel-item class="item" label="保险费用：" labelWidth="70px"><p class="text" :title="data.insuranceCost">{{
+      data.insuranceCost }}</p></panel-item>
+    <panel-item class="item" label="保险期限：" labelWidth="70px"><p class="text" :title="data.insuranceLimit">{{
+      data.insuranceLimit }}</p></panel-item>
     <div class="details">
       <p class="title">详细条款</p>
       <div class="content">
@@ -44,8 +46,8 @@
               <div v-if="index <= step - 1 && item.approvalStatus">
                 <p :class="[
                 { statusYes: item.approvalStatus == 1 },
-                { statusNo: item.approvalStatus == 2 }, 
-                { statusWait: item.approvalStatus == 0 }, 
+                { statusNo: item.approvalStatus == 2 },
+                { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
                   ({{ item.approvalStatus | statusFormat }})
@@ -53,18 +55,19 @@
               </div>
             </div>
             <!-- 学生端只初始化第一步的审批人 index === 0 -->
-            <el-select 
-              class="zjy-select" 
-              v-model="approver" 
-              placeholder="请选择审批人" 
-              slot="custom" 
-              slot-scope="props" 
-              @change="handleChange" 
-              v-if="props.data.approvalType == 1 
-              && index === 0 
+            <el-select
+              class="zjy-select"
+              v-model="approver"
+              placeholder="请选择审批人"
+              slot="custom"
+              slot-scope="props"
+              @change="handleChange"
+              v-if="props.data.approvalType == 1
+              && index === 0
               && !props.data.approvalStatus"
             >
-              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName" :value="item.teacherId">
+              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
+                         :value="item.teacherId">
               </el-option>
             </el-select>
           </zjy-step>
@@ -85,14 +88,14 @@
 import Panel from '@/components/panel/panel'
 import PanelItem from '@/components/panel-item/panel-item'
 import ZjyButton from '@/components/button'
-import { ZjyStep, ZjySteps } from '@/components/steps'
+import {ZjyStep, ZjySteps} from '@/components/steps'
 
 import allInsuranceAPI from '@/api/student/insurance/all'
 
-import { mapGetters } from 'vuex'
+import {mapGetters} from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
       step: 1,                // 申请操作与查看操作分开，因此申请操作中的step总是1
       steps: [],              // 审批流程步骤
@@ -105,7 +108,7 @@ export default {
   },
 
   props: {
-    type: Number,  // 1-查看 2-申请 
+    type: Number,  // 1-查看 2-申请
     data: Object,  // 投保设置信息
     value: Object,  //
     closed: Boolean
@@ -125,16 +128,17 @@ export default {
 
   methods: {
     // 学生选择下一审批教师
-    handleChange(val) {
+    handleChange (val) {
       this.nextApproverId = val
-      if (this.hasNextApprover)
+      if (this.hasNextApprover) {
         this.nextApproverName = this.approverList.find(
           x => x.teacherId === val
         ).teacherName
+      }
     },
 
     // 学生申请保险提交
-    create() {
+    create () {
       if (this.hasNextApprover && !this.approver) {
         this.$alert('请填写审批人')
         return
@@ -162,23 +166,23 @@ export default {
       })
     },
 
-    //申请时关闭
-    cancel() {
+    // 申请时关闭
+    cancel () {
       this.$emit('submit', 0)
       this.clear()
     },
 
     clear () {
-      this.step = 1               
-      this.steps = []              
-      this.approver = ''         
-      this.approverList = []    
+      this.step = 1
+      this.steps = []
+      this.approver = ''
+      this.approverList = []
       this.hasNextApprover = false
       this.nextApproverName = ''
       this.nextApproverId = ''
     },
     // 查看时关闭
-    close() {
+    close () {
       this.$emit('submit', 0)
     },
 
@@ -187,13 +191,13 @@ export default {
     }
   },
 
-  mounted() {
+  mounted () {
   },
 
   watch: {
     value: {
       immediate: true,
-      handler(val) {
+      handler (val) {
         if (this.$empty(val)) return
 
         this.approverList = val[+Object.keys(val).find(x => Number(x) == x)] || {}
@@ -204,57 +208,59 @@ export default {
       }
     },
 
-    closed(val) {
+    closed (val) {
       if (val) this.clear()
     }
   }
 }
 </script>
 <style lang='scss' scoped>
-.item {
-  .text {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  width: 180px;
-  margin-right: 20px;
-  margin-bottom: 15px;
-  &:first-child {
-    width: 300px
-  }
-  &:nth-of-type(3) {
-    width: 150px;
-  }
-  &:nth-of-type(4) {
-    width: 300px;
-  }
-  &.block {
-    width: 100%;
-    .zjy-panel-item__label {
-      display: block;
+  .item {
+    .text {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    width: 180px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    &:first-child {
+      width: 300px
+    }
+    &:nth-of-type(3) {
+      width: 150px;
+    }
+    &:nth-of-type(4) {
+      width: 300px;
+    }
+    &.block {
+      width: 100%;
+      .zjy-panel-item__label {
+        display: block;
+      }
     }
   }
-}
-.status {
-  > span,
-  > img {
-    vertical-align: middle;
-  }
-  margin-bottom: 10px;
-}
-.details {
-  padding: 20px;
-  background-color: #f5f5f5;
-  .title {
-    color: #333333;
-    font-weight: bold;
-  }
-  margin-bottom: 15px;
-}
 
-.content {
-  overflow-y: auto;
-  max-height: 200px;
-}
+  .status {
+    > span,
+    > img {
+      vertical-align: middle;
+    }
+    margin-bottom: 10px;
+  }
+
+  .details {
+    padding: 20px;
+    background-color: #f5f5f5;
+    .title {
+      color: #333333;
+      font-weight: bold;
+    }
+    margin-bottom: 15px;
+  }
+
+  .content {
+    overflow-y: auto;
+    max-height: 200px;
+  }
 </style>

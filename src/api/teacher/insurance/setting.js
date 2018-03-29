@@ -37,6 +37,6 @@ export default {
   },
 
   batchRemove (ids) {
-
+    return ajax.delete('/manage/insurance-setting/batch/' + ids)
   }
 }

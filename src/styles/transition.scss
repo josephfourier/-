@@ -22,3 +22,26 @@
 .fade-enter, .fade-leave-to  {
     opacity: 0;
 }
+
+.breadcrumb1-enter-active,
+.breadcrumb1-leave-active{
+  transition: all .4s
+}
+
+.breadcrumb1-move {
+  transition: all .4s
+}
+
+.breadcrumb1-leave-active {
+  position: absolute;
+}
+
+.breadcrumb1-enter {
+  opacity: 0;
+  transform: translateX(30px)
+}
+
+.breadcrumb1-leave-to {
+  opacity: 0;
+  transform: translateY(30px)
+}

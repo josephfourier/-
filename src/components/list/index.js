@@ -3,7 +3,7 @@ import List from './List'
 export default {
   name: 'ZJYList',
 
-  render(h) {
+  render (h) {
     return (
       <List data={this.data} status={this.status} message={this.message}></List>
     )

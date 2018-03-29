@@ -42,9 +42,9 @@
     </div>
 
     <el-dialog :title="title" :visible.sync="visible" width="800px">
-      <application 
-        :data="setting" 
-        v-model="value" 
+      <application
+        :data="setting"
+        v-model="value"
         :closed="!visible"
         :type="type"
         @submit="handleSubmit"
@@ -63,7 +63,7 @@ import { getPermissionId } from '@/utils'
 import axios from 'axios'
 
 export default {
-  data() {
+  data () {
     return {
       setting: {}, // 保单设置详情
       value: {},   // 保单对应审批
@@ -80,33 +80,33 @@ export default {
       visible: false,
       type: 1, // 查看或申请操作
       types: {
-        VIEW  :   1,
-        APPLY :   2
+        VIEW: 1,
+        APPLY: 2
       }
     }
   },
 
   methods: {
-    statusFormate(row, column, cellValue) {
+    statusFormate (row, column, cellValue) {
       return ['可申请', '申请中'][+cellValue]
     },
 
-    handleSubmit(val) {
+    handleSubmit (val) {
       this.visible = false
       // 查看操作时关闭
-    
+
       if (val === 1) {
         this.refresh()
       }
     },
 
-    rowStyle({ row, rowIndex }) {
+    rowStyle ({ row, rowIndex }) {
       return {
         textAlign: 'center'
       }
     },
 
-    view(row) {
+    view (row) {
       this.title = '保单详情'
       this.type = this.types.VIEW
       insuranceAPI
@@ -118,7 +118,7 @@ export default {
         .catch(error => {})
     },
 
-    create(row) {
+    create (row) {
       this.title = '保单申请'
       this.type = this.types.APPLY
 
@@ -136,11 +136,11 @@ export default {
         )
     },
 
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    refresh() {
+    refresh () {
       const old = this.currentPage
       this.currentPage = -1
       setTimeout(() => {
@@ -161,7 +161,7 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
 
         this.loading = true
@@ -179,11 +179,11 @@ export default {
       }
     },
 
-    list(val) {
+    list (val) {
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     },
 
-    active(val) {
+    active (val) {
       if (val) this.refresh()
     }
   }

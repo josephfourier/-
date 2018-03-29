@@ -36,9 +36,9 @@
       <el-dialog title="请输入档案材料名称" :visible.sync="visible" width="800px">
         <stufile
           v-if="visible"
-          :formData="stufile" 
-          :list="list" 
-          :type="type" 
+          :formData="stufile"
+          :list="list"
+          :type="type"
           @close="handleClose"
         ></stufile>
       </el-dialog>
@@ -51,7 +51,7 @@ import stufileAPI from '@/api/teacher/stufile/setting'
 import Stufile from './Stufile'
 
 export default {
-  data() {
+  data () {
     return {
       list: [],
       stufile: {
@@ -66,12 +66,12 @@ export default {
   },
 
   methods: {
-    create() {
+    create () {
       this.type = 2
       this.visible = true
     },
 
-    _delete(row) {
+    _delete (row) {
       stufileAPI.delete(row.stufilesettingUid).then(response => {
         if (response.code === 1) {
           this.$alert('删除成功')
@@ -80,13 +80,13 @@ export default {
       })
     },
 
-    edit(row) {
+    edit (row) {
       this.type = 1
       this.stufile = { ...row }
       this.visible = true
     },
 
-    handleClose(val) {
+    handleClose (val) {
       this.visible = false
       this.stufile = {
         stufileName: '',
@@ -97,7 +97,7 @@ export default {
       }
     },
 
-    refresh() {
+    refresh () {
       this.loading = true
       stufileAPI
         .queryForList()
@@ -115,12 +115,12 @@ export default {
     Stufile
   },
 
-  created() {
+  created () {
     this.refresh()
   },
 
   watch: {
-    list(val) {
+    list (val) {
       if (!val) return
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     }

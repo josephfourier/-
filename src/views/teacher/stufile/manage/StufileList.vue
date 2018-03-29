@@ -5,6 +5,19 @@
       <div class="zjy-table-search__item">
         <span>年份</span>
         <el-select v-model="query.enterYear" placeholder="请选择">
+          <el-option
+            label="不限"
+            value=""
+          >
+          </el-option>
+          <el-option
+            v-for="item in optionsYear"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+
+          </el-option>
         </el-select>
       </div>
       <div class="zjy-table-search__item">
@@ -83,10 +96,10 @@
 
     <el-dialog :title="title" :visible.sync="visible" width="800px">
 
-      <file 
+      <file
         v-if="visible"
         :formData="file"
-        v-model="settings" 
+        v-model="settings"
         @close="handleClose"
         :type="type"
         :list="fileList"
@@ -106,7 +119,7 @@ import ZjyPagination from '@/components/pagination'
 import { dateFormat as _dateFormat } from '@/utils'
 
 export default {
-  data() {
+  data () {
     return {
       currentPage: 1,
       list: [],
@@ -127,12 +140,23 @@ export default {
       file: {}, // 学生档案
       fileList: [],
       settings: [],
-      type: 2 //0-查看 1-编辑 2新增
+      type: 2, // 0-查看 1-编辑 2新增0
+      optionsYear:
+        [
+          {
+            label: '2017年',
+            value: '2017'
+          },
+          {
+            label: '2018年',
+            value: '2018'
+          }
+        ]
     }
   },
 
   methods: {
-    clearFileList() {
+    clearFileList () {
       for (let i = 0; i < this.fileList.length; ++i) {
         this.fileList[i].stufileName = ''
         this.fileList[i].stufilePath = ''
@@ -141,7 +165,7 @@ export default {
       }
     },
 
-    create() {
+    create () {
       this.type = 2
       this.file = {}
       this.title = '新增学生档案'
@@ -149,21 +173,19 @@ export default {
       this.clearFileList()
     },
 
-    edit(row) {
-      
+    edit (row) {
       this.type = 1
       this.title = '编辑学生档案'
       stufileManageAPI.queryForObject(row.stufileUid).then(response => {
-        
         if (response.code !== 1) this.$alert('获取学生档案失败')
         this.file = response.data
         const _ = response.data.stufileListList
         this.clearFileList()
 
         for (let i = 0; i < this.fileList.length; ++i) {
-           this.fileList[i].stufileUid = row.stufileUid
+          this.fileList[i].stufileUid = row.stufileUid
         }
-        
+
         for (let i = 0; i < this.fileList.length; ++i) {
           for (let j = 0; j < _.length; ++j) {
             if (_[j].swmsStufileSetting && this.fileList[i].stufilesettingUid == _[j].swmsStufileSetting.stufilesettingUid) {
@@ -179,23 +201,25 @@ export default {
       })
     },
 
-    _import() {
+    _import () {
       this.show = !this.show
     },
 
-    _export() {},
+    _export () {},
 
-    search() {},
+    search () {
+      this.refresh()
+    },
 
-    currentChange(pageNumber) {
+    currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    dateFormat(row, column, cellValue) {
+    dateFormat (row, column, cellValue) {
       return _dateFormat(cellValue)
     },
 
-    handleSubmit(val) {
+    handleSubmit (val) {
       this.visible = false
       // 查看操作时关闭
 
@@ -204,20 +228,21 @@ export default {
       }
     },
 
-    refresh() {
+    refresh () {
       const old = this.currentPage
       this.currentPage = -1
       setTimeout(() => (this.currentPage = old), 100)
     },
 
-    handleClose() {
+    handleClose () {
       this.visible = false
+      this.refresh()
     }
   },
 
-  created() {
+  created () {
     stufileAPI.queryForList().then(resposne => {
-      if (resposne.code !==1) {
+      if (resposne.code !== 1) {
         this.$alert('获取档案设置失败')
         return
       }
@@ -225,12 +250,13 @@ export default {
       for (let i = 0; i < this.settings.length; ++i) {
         this.fileList.push({
           index: i,
-          stufileName: "",
+          stufileName: '',
           stufilesettingUid: this.settings[i].stufilesettingUid,
-          stufilePath: ""
+          stufilePath: ''
         })
       }
     }).catch(error => {
+      console.log(error)
     })
   },
   components: {
@@ -242,29 +268,26 @@ export default {
   watch: {
     currentPage: {
       immediate: true,
-      handler(val, oldval) {
+      handler (val, oldval) {
         if (val === -1) return
 
         this.loading = true
         this.query.offset = this.query.limit * (val - 1)
-        stufileManageAPI
-          .queryForList(this.query)
-          .then(response => {
-            if (response.code === 1) {
-              this.list = response.rows
-              this.total = response.total
-            } else {
-              this.$alert(response.message)
-            }
-            this.loading = false
-          })
-          .catch(err => {
-            this.loading = false
-          })
+        stufileManageAPI.queryForList(this.query).then(response => {
+          if (response.code === 1) {
+            this.list = response.rows
+            this.total = response.total
+          } else {
+            this.$alert(response.message)
+          }
+          this.loading = false
+        }).catch(error => {
+          this.loading = false
+        })
       }
     },
 
-    list(val) {
+    list (val) {
       if (!val) return
       this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
     }
