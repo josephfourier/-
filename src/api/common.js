@@ -22,5 +22,13 @@ export default {
 
   querySpecialtyByFaculty (code) {
     return ajax.get('/manage/insurance/specialty/' + code)
+  },
+
+  queryClassList () {
+    return ajax.get('/manage/stufile/student/class')
+  },
+
+  queryHolidayTypeList () {
+    return ajax.get('/manage/common/dict/DICT_HOLIDAY_TYPE')
   }
 }

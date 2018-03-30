@@ -29,8 +29,8 @@ export default {
     return {
       rules: {
         stufileName: [
-          { required: true, message: '请输入保险名称', trigger: 'blur' },
-          { validator: checkExists, trigger: 'blur'}
+          {required: true, message: '请输入档案名称', trigger: 'blur'},
+          {validator: checkExists, trigger: 'blur'}
         ]
       }
     }

@@ -17,8 +17,9 @@
           {{ data.insuranceLiability }}
         </div>
       </div>
-      <panel-item label="审批流程">
-        <p v-if="steps.length === 0"> 还未配置流程</p>
+      <p>审批流程</p>
+
+        <p v-if="steps.length === 0">还未配置流程</p>
         <div class="zjy-steps" v-else>
           <zjy-steps :active="step" align-center>
             <zjy-step title="发起人" :description="'(' + user.fullName + ')'">
@@ -43,7 +44,6 @@
             </zjy-step>
           </zjy-steps>
         </div>
-      </panel-item>
 
       <p v-if="reason && isFinished" class="refused">拒绝原因: {{ reason }}</p>
       <div class="zjy-footer" v-if="isFinished && !reason">
@@ -135,6 +135,7 @@ export default {
     margin-bottom: 15px;
     &.block {
       width: 100%;
+      display: block;
     }
   }
 

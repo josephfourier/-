@@ -1,91 +1,102 @@
 <!-- 教师审批学生投保流程 -->
 <template>
-  <panel>
-    <panel-item class="item" label="学号" labelWidth="70px">{{ data.studentNo }}</panel-item>
-    <panel-item class="item" label="学生姓名" labelWidth="70px">{{ data.studentName }}</panel-item>
-    <panel-item class="item" label="入学年份" labelWidth="70px">{{ data.enterYear }}</panel-item>
-    <panel-item class="item" label="院系" labelWidth="70px">{{ data.facultyName }}</panel-item>
-    <panel-item class="item" label="专业" labelWidth="70px">{{ data.specialtyName }}</panel-item>
-    <panel-item class="item" label="班级" labelWidth="70px">{{ data.className }}</panel-item>
-    <panel-item class="item" label="申请日期" labelWidth="70px">{{ data.applyDate | dateFormat }}</panel-item>
-
-    <panel-item class="item" label="保险名称：" labelWidth="70px">{{ data.insuranceName }}</panel-item>
-    <panel-item class="item" label="保险金额：" labelWidth="70px">{{ data.insuranceCost }}</panel-item>
-    <panel-item class="item" label="险种类别：" labelWidth="70px">{{ data.insuranceCategory }}</panel-item>
-    <panel-item class="item" label="保险期限：" labelWidth="70px">{{ data.insuranceLimit }}</panel-item>
-    <div class="details">
-      <p class="title">保险责任</p>
-      <div class="content">
-        {{ data.insuranceLiability }}
-      </div>
+  <div>
+    <div class="status" v-if="!reason && isFinished">
+      <img src="./ic_wait.png" alt="确认状态">
+      <span>待付款</span>
     </div>
-    <panel-item label="审批流程">
-      <p v-if="steps.length === 0"> 还未配置流程</p>
-      <div class="zjy-steps" v-else>
-        <zjy-steps :active="step" align-center>
-          <zjy-step title="发起人" :description="'(' + data.studentName + ')'">
-          </zjy-step>
-          <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">
-            <div slot="description">
-              <div v-if="item.approvalType == 2 || item.approvalStatus">
-                ({{ item.teacherName }})
-              </div>
-              <div v-else>
-                <p v-if="index === step - 1 && approver">
-                  ({{ nextApproverName }})
-                </p>
+    <panel>
+      <panel-item class="item" label="学号" labelWidth="70px">{{ data.studentNo }}</panel-item>
+      <panel-item class="item" label="学生姓名" labelWidth="70px">{{ data.studentName }}</panel-item>
+      <panel-item class="item" label="入学年份" labelWidth="70px">{{ data.enterYear }}</panel-item>
+      <panel-item class="item" label="院系" labelWidth="70px">{{ data.facultyName }}</panel-item>
+      <panel-item class="item" label="专业" labelWidth="70px">{{ data.specialtyName }}</panel-item>
+      <panel-item class="item" label="班级" labelWidth="70px">{{ data.className }}</panel-item>
+      <panel-item class="item" label="申请日期" labelWidth="70px">{{ data.applyDate | dateFormat }}</panel-item>
 
-              </div>
-              <div v-if="index <= step - 1 && item.approvalStatus">
-                <p :class="[
+      <panel-item class="item" label="保险名称：" labelWidth="70px">{{ data.insuranceName }}</panel-item>
+      <panel-item class="item" label="保险金额：" labelWidth="70px">{{ data.insuranceCost }}</panel-item>
+      <panel-item class="item" label="险种类别：" labelWidth="70px">{{ data.insuranceCategory }}</panel-item>
+      <panel-item class="item" label="保险期限：" labelWidth="70px">{{ data.insuranceLimit }}</panel-item>
+      <div class="details">
+        <p class="title">保险责任</p>
+        <div class="content">
+          {{ data.insuranceLiability }}
+        </div>
+      </div>
+      <panel-item label="审批流程" v-if="!isFinished">
+        <p v-if="steps.length === 0"> 还未配置流程</p>
+        <div class="zjy-steps" v-else>
+          <zjy-steps :active="step" align-center>
+            <zjy-step title="发起人" :description="'(' + data.studentName + ')'">
+            </zjy-step>
+            <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">
+              <div slot="description">
+                <div v-if="item.approvalType == 2 || item.approvalStatus">
+                  ({{ item.teacherName }})
+                </div>
+                <div v-else>
+                  <p v-if="index === step - 1 && approver">
+                    ({{ nextApproverName }})
+                  </p>
+
+                </div>
+                <div v-if="index <= step - 1 && item.approvalStatus">
+                  <p :class="[
                 { statusYes: item.approvalStatus == 1 },
                 { statusNo: item.approvalStatus == 2 },
                 { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
-                  ({{ item.approvalStatus | statusFormat }})
-                </p>
+                    ({{ item.approvalStatus | statusFormat }})
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <el-select
-              class="zjy-select"
-              v-model="approver"
-              placeholder="请选择审批人"
-              slot="custom"
-              slot-scope="props"
-              @change="handleChange"
-              v-if="props.data.approvalType == 1
+              <el-select
+                class="zjy-select"
+                v-model="approver"
+                placeholder="请选择审批人"
+                slot="custom"
+                slot-scope="props"
+                @change="handleChange"
+                v-if="props.data.approvalType == 1
               && index === step - 1
               && !props.data.approvalStatus
               && isApprovered
               && !reason"
-            >
-              <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
-                         :value="item.teacherId">
-              </el-option>
-            </el-select>
-          </zjy-step>
-        </zjy-steps>
+              >
+                <el-option v-for="item in approverList" :key="item.teacherId" :label="item.teacherName"
+                           :value="item.teacherId">
+                </el-option>
+              </el-select>
+            </zjy-step>
+          </zjy-steps>
+        </div>
+      </panel-item>
+      <div class="zjy-footer" v-if="!isFinished && isMyStep">
+        <template v-if="!isApprovered">
+          <zjy-button type="plain" @click="no">拒绝</zjy-button>
+          <zjy-button type="primary" @click="yes">同意</zjy-button>
+        </template>
+        <zjy-button type="primary" v-else @click="submit">提交</zjy-button>
       </div>
-    </panel-item>
-    <div class="zjy-footer" v-if="!isFinished && isMyStep">
-      <template v-if="!isApprovered">
-        <zjy-button type="plain" @click="no">拒绝</zjy-button>
-        <zjy-button type="primary" @click="yes">同意</zjy-button>
-      </template>
-      <zjy-button type="primary" v-else @click="submit">提交</zjy-button>
-    </div>
 
-    <el-dialog width="30%" title="请输入拒绝原因" :visible.sync="innerVisible" append-to-body>
-      <zjy-input type="textarea" v-model="reason"></zjy-input>
-      <div class="zjy-footer">
-        <zjy-button type="plain" @click="innerNo">拒 绝</zjy-button>
-        <zjy-button type="primary" @click="innerYes">同 意</zjy-button>
+      <div class="zjy-footer" v-if="isFinished && !reason">
+        <zjy-button type="primary"  @click="$emit('close')">关闭</zjy-button>
       </div>
-    </el-dialog>
-    <p v-if="reason && isFinished" class="refused">拒绝原因: {{ reason }}</p>
-  </panel>
+
+      <el-dialog width="30%" title="请输入拒绝原因" :visible.sync="innerVisible" append-to-body>
+        <zjy-input type="textarea" v-model="reason"></zjy-input>
+        <div class="zjy-footer">
+          <zjy-button type="plain" @click="innerNo">拒 绝</zjy-button>
+          <zjy-button type="primary" @click="innerYes">同 意</zjy-button>
+        </div>
+      </el-dialog>
+      <p v-if="reason && isFinished" class="refused">拒绝原因: {{ reason }}</p>
+    </panel>
+  </div>
+
 </template>
 
 <script>
@@ -217,9 +228,7 @@ export default {
       handler (val) {
         if (this.$empty(val)) return
 
-        this.steps = val.swmsApprovals.sort(
-          (x, y) => x.approvalStep - y.approvalStep
-        )
+        this.steps = val.swmsApprovals.sort((x, y) => x.approvalStep - y.approvalStep)
 
         try {
           this.step = this.steps.find(x => x.approvalStatus == 0).approvalStep
@@ -230,7 +239,9 @@ export default {
           if (_) {
             this.step = _.approvalStep
             this.reason = _.approvalOpinion
-          } else { this.step = this.steps.length + 1 }
+          } else {
+            this.step = this.steps.length + 1
+          }
           this.isFinished = true
         }
 
@@ -245,9 +256,6 @@ export default {
       else this.step--
     }
 
-    // closed(val) {
-    //   if (val) this.clear()
-    // }
   }
 }
 </script>

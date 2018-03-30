@@ -71,6 +71,7 @@
               :ref="'upload' + scope.$index"
               :disabled="isUploading"
               v-if="!fileList[scope.$index].stufilePath" class="zjy-table-upload"
+              accept="image/gif, image/jpeg"
               :action="action + '?index=' + scope.$index" :headers="{'Zjy-Token': token}" multiple :limit="3"
               :showFileList="false" :before-upload="handleBeforeUpload" :on-progress="handleProgress"
               :on-success="handleSuccess" :on-error="handleError" :auto-upload="true" :file-list="fl">
@@ -320,8 +321,8 @@ export default {
               : this.data.stufileNo + this.studentNo
         arg.recipient = this.data.recipient
         arg.schoolCode = this.data.schoolCode
-        ;(arg.stufileDate = new Date(this.data.stufileDate).getTime()),
-        (arg.stufileDescription = this.data.stufileDescription)
+        arg.stufileDate = new Date(this.data.stufileDate).getTime()
+        arg.stufileDescription = this.data.stufileDescription
         arg.status = 1
 
         let stufileListList = []

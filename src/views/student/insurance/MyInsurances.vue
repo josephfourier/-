@@ -1,4 +1,3 @@
-<!-- 投保管理教师端 -->
 <template>
   <div class="wrapper">
     <div class="zjy-table">
@@ -133,7 +132,7 @@ export default {
     },
 
     list (val) {
-      this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
+      if (val) { this.empty = val.length === 0 ? '暂无数据' : '数据加载中...' }
     },
 
     active (val) {

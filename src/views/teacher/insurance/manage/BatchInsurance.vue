@@ -97,7 +97,7 @@ export default {
       rules: {
         enterYear: [
           {required: true, message: '请选择投保年级', trigger: 'blur'}
-          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+
         ],
         factoryCode: [
           {required: true, message: '请选择投保院系', trigger: 'blur'}
@@ -126,7 +126,8 @@ export default {
             if (response.code !== 1) {
               this.$alert(response.message)
             } else {
-
+              this.$alert('投保成功')
+              this.$emit('closed')
             }
           }).catch(error => {
             console.log(error)
