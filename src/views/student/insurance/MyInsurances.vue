@@ -36,7 +36,17 @@
     </div>
 
     <el-dialog title="审批进度" :visible.sync="visible" width="800px">
-      <my-application :data="setting" v-model="value" v-if="visible" @submit="handleSubmit" @close="visible = false"></my-application>
+      <!--<my-application :data="setting" v-model="value" v-if="visible" @submit="handleSubmit" @close="visible = false"></my-application>-->
+      <process-view
+        :data="setting"
+        v-model="value"
+        v-if="visible"
+        :visible.sync="visible"
+      >
+        <template slot-scope="props">
+          <form-view :data="props.formData"></form-view>
+        </template>
+      </process-view>
     </el-dialog>
   </div>
 </template>
@@ -47,7 +57,8 @@ import commonAPI from '@/api/common'
 
 import ZjyPagination from '@/components/pagination'
 import MyApplication from './MyApplication'
-
+import ProcessView from './ProcessView'
+import FormView from './FormView'
 export default {
   data () {
     return {
@@ -103,7 +114,9 @@ export default {
 
   components: {
     ZjyPagination,
-    MyApplication
+    MyApplication,
+    ProcessView,
+    FormView
   },
 
   props: {

@@ -1,4 +1,5 @@
 import ajax from '@/utils/ajax'
+import { selfMerge } from '@/utils'
 
 export default {
 
@@ -17,24 +18,17 @@ export default {
       params: query,
       transformResponse: data => {
         const json = JSON.parse(data)
-        console.log(json)
         if (json.code !== 1) return json
 
         const total = json.data.total
         const code = json.code
-        const rows = json.data.rows.map(item => {
-          return {
-            stuidcardUid: item.stuidcardUid,
-            studentId: item.studentId,
-            studentNo: item.ucenterStudent.studentNo,
-            studentName: item.ucenterStudent.studentName,
-            facultyName: item.ucenterStudent.facultyName,
-            enterYear: item.ucenterStudent.enterYear,
-            appNum: item.appNum,
-            dataStatus: item.dataStatus
-          }
-        })
+        let rows = []
 
+        for (let i = 0; i < json.data.rows.length; ++i) {
+          let row = {}
+          selfMerge(json.data.rows[i], row)
+          rows.push(row)
+        }
         return {
           code,
           total,

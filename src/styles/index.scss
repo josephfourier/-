@@ -16,6 +16,9 @@
 @import './radio.scss';
 @import './date.scss';
 
+@import "./search-panel.scss";
+@import "./icon.scss";
+
 .main-container {
   margin-left: 160px;
   &.hideSide {

@@ -89,6 +89,7 @@ export default {
     },
     table: {
       emptyText: '暂无数据',
+      loadingText: '数据加载中...',
       confirmFilter: '筛选',
       resetFilter: '重置',
       clearFilter: '全部',
@@ -104,6 +105,9 @@ export default {
       filterPlaceholder: '请输入搜索内容',
       noCheckedFormat: '共 {total} 项',
       hasCheckedFormat: '已选 {checked}/{total} 项'
+    },
+    refresh: {
+      delay: '300'
     }
   }
 }

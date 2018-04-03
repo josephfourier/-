@@ -1,7 +1,7 @@
 import List from './List'
 
 export default {
-  name: 'ZJYList',
+  name: 'ZjyList',
 
   render (h) {
     return (

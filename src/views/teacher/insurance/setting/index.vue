@@ -1,77 +1,45 @@
 <!-- 投保管理教师端 -->
 <template>
-  <div class="zjy-app zjy-insurance">
-    <div class="zjy-table">
-      <div class="zjy-table-oper">
+  <div class="zjy-app">
+      <zjy-table-operator>
+        <operator-item clz="create" @click="create">新增</operator-item>
+        <operator-item @click="batchRemove">批量删除</operator-item>
+      </zjy-table-operator>
 
-        <div class="zjy-table-oper__item">
-          <div class="zjy-table-oper--create">
-            <a href="javascript:;" @click="create">新增</a>
-          </div>
-        </div>
-
-        <div class="zjy-table-oper__item">
-          <div class="zjy-table-oper--del">
-            <a href="javascript:;" @click="batchRemove">批量删除</a>
-          </div>
-        </div>
-      </div>
-      <el-table
-        @selection-change="handleSelectionChange"
-        :data="insuranceList"
-        style="width: 100%"
-        :row-style="rowStyle"
-        :header-row-style="rowStyle"
-        :header-cell-style="rowStyle"
+      <zjy-table
         v-loading="loading"
+        :data="list"
+        :columns="columns"
+        @edit="edit"
+        @delete="_delete"
+        @selection-change="handleSelectionChange"
+      ></zjy-table>
+
+    <div class="zjy-pagination" v-if="list.length !== 0">
+      <zjy-pagination
+        :currentPage="currentPage"
+        :total="total"
+        @current-change="currentChange"
       >
-        <el-table-column type="selection" width="30">
-        </el-table-column>
-        <el-table-column type="index" label="序号" :index="1" width="45">
-        </el-table-column>
-        <el-table-column prop="insuranceName" label="险种名称" width="200">
-        </el-table-column>
-        <el-table-column prop="insuranceCompany" label="保险公司" width="120">
-        </el-table-column>
-        <el-table-column prop="insuranceCategory" label="险种类别" width="120">
-        </el-table-column>
-        <el-table-column prop="insuranceCost" label="保险费用" width="100">
-        </el-table-column>
-        <el-table-column prop="insuranceLimit" label="保险期限" width="100">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <div class="table-oper-group">
-              <a href="javascript:" @click="edit(scope.row)" class="zjy-btn-edit">
-                <i class="zjy-icon"></i>
-                <span>编辑</span>
-              </a>
-
-              <a href="javascript:" @click="_delete(scope.row)" class="zjy-btn-delete">
-                <i class="zjy-icon"></i>
-                <span>删除</span>
-              </a>
-            </div>
-          </template>
-        </el-table-column>
-
-        <span slot="empty">{{ empty }}</span>
-      </el-table>
-    </div>
-    <div class="zjy-pagination" v-if="insuranceList.length !== 0">
-      <zjy-pagination :currentPage="currentPage" :total="total" @current-change="currentChange">
       </zjy-pagination>
     </div>
 
-    <el-dialog :title="title" :visible.sync="visible" width="800px" @close="handleClose">
-      <insurance-setting
-        v-if="visible"
-        :formData="setting"
-        :type="type"
-        @closed="handleInnerClose"
+    <div class="zjy-dialog">
+      <el-dialog
+        :title="title"
+        :visible.sync="visible"
+        width="800px"
+        @close="visible=false"
       >
-      </insurance-setting>
-    </el-dialog>
+        <insurance-setting
+          v-if="visible"
+          :formData="setting"
+          :type="type"
+          @closed="handleInnerClose"
+        >
+        </insurance-setting>
+      </el-dialog>
+    </div>
 
   </div>
 </template>
@@ -81,10 +49,15 @@ import insuranceAPI from '@/api/teacher/insurance/setting'
 import InsuranceSetting from './InsuranceSetting'
 import ZjyPagination from '@/components/pagination'
 
+import ZjyTable from '@/components/table'
+import ZjyTableOperator from '@/components/table-operator'
+import OperatorItem from '@/components/table-operator/operator-item'
+import { _refresh } from '@/utils'
+
 export default {
   data () {
     return {
-      insuranceList: [],
+      list: [],
       currentPage: 1,
       total: 0,
       query: {
@@ -92,15 +65,60 @@ export default {
         limit: 10
       },
       title: '',
-      empty: '数据加载中....',
       loading: false,
       visible: false,
+
       type: 1, // 1编辑 2新增
       setting: {
         isOpen: '1',
         isPay: '1'
       }, // 新增投保设置
-      selectedRows: []
+      selectedRows: [],
+
+      columns: [
+        {
+          index: true,
+          select: true
+        },
+        {
+          label: '险种名称',
+          prop: 'insuranceName',
+          width: '300'
+        },
+        {
+          label: '保险公司',
+          prop: 'insuranceCompany',
+          width: '200'
+        },
+        {
+          label: '险种类别',
+          prop: 'insuranceCategory'
+        },
+        {
+          label: '保险费用',
+          prop: 'insuranceCost'
+        },
+        {
+          label: '保险期限',
+          prop: 'insuranceLimit'
+        },
+        {
+          label: '操作',
+          width: '200',
+          operators: [
+            {
+              label: '删除',
+              render: true,
+              cmd: 'delete'
+            },
+            {
+              label: '编辑',
+              render: true,
+              cmd: 'edit'
+            }
+          ]
+        }
+      ]
     }
   },
 
@@ -116,32 +134,26 @@ export default {
     },
 
     edit (row) {
-      this.title = '编辑保险'
-      this.type = 1
-      this.visible = true
-      insuranceAPI
-        .queryForObject(row.inssettingUid)
-        .then(response => {
-          this.setting = response.data
-        })
-        .catch(error => {
-        })
+      insuranceAPI.queryForObject.call(this, row.inssettingUid).then(response => {
+        this.title = '编辑保险'
+        this.type = 1
+        this.visible = true
+        this.setting = response.data
+      }).catch(error => {
+        console.log(error)
+      })
     },
 
     _delete (row) {
-      insuranceAPI
-        .delete(row.inssettingUid)
-        .then(response => {
-          if (response.code !== 1) {
-            this.$alert(response.message)
-          } else { this.refresh() }
-        })
-        .catch(error => {
-        })
-    },
-
-    handleClose () {
-      this.visible = false
+      insuranceAPI.delete(row.inssettingUid).then(response => {
+        if (response.code !== 1) {
+          this.$alert(response.message)
+        } else {
+          this.refresh()
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     },
 
     handleInnerClose () {
@@ -173,28 +185,21 @@ export default {
       this.selectedRows = rows
     },
 
-    rowStyle ({row, rowIndex}) {
-      return {
-        textAlign: 'center'
-      }
-    },
-
     currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
     refresh () {
-      const old = this.currentPage
-      this.currentPage = -1
-      setTimeout(() => {
-        this.currentPage = old
-      }, 100)
+      _refresh.call(this)
     }
   },
 
   components: {
     ZjyPagination,
-    InsuranceSetting
+    InsuranceSetting,
+    ZjyTable,
+    ZjyTableOperator,
+    OperatorItem
   },
 
   watch: {
@@ -203,23 +208,14 @@ export default {
       handler (val, oldval) {
         if (val === -1) return
 
-        this.loading = true
         this.query.offset = this.query.limit * (val - 1)
-        insuranceAPI
-          .queryForList(this.query)
-          .then(response => {
-            this.insuranceList = response.rows
-            this.total = response.total
-            this.loading = false
-          })
-          .catch(err => {
-            this.loading = false
-          })
+        insuranceAPI.queryForList.call(this, this.query).then(response => {
+          this.list = response.rows
+          this.total = response.total
+        }).catch(error => {
+          console.log(error)
+        })
       }
-    },
-
-    insuranceList (val) {
-      if (val) { this.empty = val.length === 0 ? '暂无数据' : '数据加载中....' }
     }
   }
 }

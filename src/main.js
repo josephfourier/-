@@ -8,11 +8,14 @@ import store from './store'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import VueI18n from 'vue-i18n'
+
 // import './mock'
 
 import './router-interceptor'
 import '@/styles/index.scss'
 
+Vue.use(VueI18n)
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
@@ -39,9 +42,17 @@ Vue.filter('dateFormat', val => {
   )
 })
 
+const i18n = new VueI18n({
+  locale: 'zh-CN',
+  messages: {
+    'zh-CN': require('@/local/lang/zh-CN').default
+  }
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  i18n,
   router,
   store,
   components: { App },

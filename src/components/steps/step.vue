@@ -124,7 +124,8 @@ export default {
         : this.space
           ? this.space
           : 100 / (len - 1) + '%')
-      style.flexBasis = space
+      // style.flexBasis = space
+      style.width = space
       if (this.isVertical) return style
       if (this.isLast) {
         style.maxWidth = 100 / this.stepsCount + '%'

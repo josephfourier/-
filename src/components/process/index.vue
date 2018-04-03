@@ -1,34 +1,11 @@
-<!-- 教师审批学生投保流程 -->
+<!-- 教师审批流程组件 -->
 <template>
   <div>
-    <!--<div class="status" v-if="!reason && isFinished">-->
-      <!--<img src="./ic_wait.png" alt="确认状态">-->
-      <!--<span>待付款</span>-->
-    <!--</div>-->
-    <!--<panel>-->
-      <!--<panel-item class="item" label="学号" labelWidth="70px">{{ data.studentNo }}</panel-item>-->
-      <!--<panel-item class="item" label="学生姓名" labelWidth="70px">{{ data.studentName }}</panel-item>-->
-      <!--<panel-item class="item" label="入学年份" labelWidth="70px">{{ data.enterYear }}</panel-item>-->
-      <!--<panel-item class="item" label="院系" labelWidth="70px">{{ data.facultyName }}</panel-item>-->
-      <!--<panel-item class="item" label="专业" labelWidth="70px">{{ data.specialtyName }}</panel-item>-->
-      <!--<panel-item class="item" label="班级" labelWidth="70px">{{ data.className }}</panel-item>-->
-      <!--<panel-item class="item" label="申请日期" labelWidth="70px">{{ data.applyDate | dateFormat }}</panel-item>-->
-      <!--<panel-item class="item" label="保险名称：" labelWidth="70px">{{ data.insuranceName }}</panel-item>-->
-      <!--<panel-item class="item" label="保险金额：" labelWidth="70px">{{ data.insuranceCost }}</panel-item>-->
-      <!--<panel-item class="item" label="险种类别：" labelWidth="70px">{{ data.insuranceCategory }}</panel-item>-->
-      <!--<panel-item class="item" label="保险期限：" labelWidth="70px">{{ data.insuranceLimit }}</panel-item>-->
-      <!--<div class="details">-->
-        <!--<p class="title">保险责任</p>-->
-        <!--<div class="content">-->
-          <!--{{ data.insuranceLiability }}-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</panel>-->
-
-    <div v-if="!isFinished">
+    <slot :formData="data"></slot>
+    <div v-if="!isFinished || reason">
       <p v-if="steps.length === 0"> 还未配置流程</p>
       <div class="zjy-steps" v-else>
-        <zjy-steps :active="step" align-center>
+        <zjy-steps :active="step">
           <zjy-step title="发起人" :description="'(' + data.studentName + ')'">
           </zjy-step>
           <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">
@@ -107,8 +84,6 @@ import ZjyButton from '@/components/button'
 import {ZjyStep, ZjySteps} from '@/components/steps'
 import ZjyInput from '@/components/input'
 
-import manageAPI from '@/api/teacher/insurance/manage'
-
 import {mapGetters} from 'vuex'
 
 export default {
@@ -126,7 +101,6 @@ export default {
       nextApproverId: '',
       reason: '', // 拒绝原因
       STATUS: {
-        awaiting: '0',
         yes: '1',
         no: '2'
       },
@@ -207,20 +181,21 @@ export default {
         this.steps[this.step - 2].approvalOpinion = this.reason
       }
 
-      manageAPI
-        .submit(this.data.insuranceUid, this.data.inssettingUid, this.steps)
-        .then(response => {
-          if (response.code === 1) {
-            this.$alert('保存成功')
-          } else {
-            this.$alert('保存失败')
-          }
-          // this.clear()
-          this.$emit('submit', 1)
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.$emit('submit', this.data, this.steps)
+      // manageAPI
+      //   .submit(this.data.insuranceUid, this.data.inssettingUid, this.steps)
+      //   .then(response => {
+      //     if (response.code === 1) {
+      //       this.$alert('保存成功')
+      //     } else {
+      //       this.$alert('保存失败')
+      //     }
+      //     // this.clear()
+      //     this.$emit('submit', 1)
+      //   })
+      //   .catch(error => {
+      //     console.log(error)
+      //   })
     }
   },
 
@@ -262,29 +237,22 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
-  .item {
-    margin-right: 50px;
-    margin-bottom: 15px;
-    &.block {
-      width: 100%;
-    }
-  }
 
-  .status {
-    > span,
-    > img {
-      vertical-align: middle;
-    }
-    margin-bottom: 10px;
-  }
+  /*.status {*/
+    /*> span,*/
+    /*> img {*/
+      /*vertical-align: middle;*/
+    /*}*/
+    /*margin-bottom: 10px;*/
+  /*}*/
 
-  .details {
-    padding: 20px;
-    background-color: #f5f5f5;
-    .title {
-      color: #333333;
-      font-weight: bold;
-    }
-    margin-bottom: 15px;
-  }
+  /*.details {*/
+    /*padding: 20px;*/
+    /*background-color: #f5f5f5;*/
+    /*.title {*/
+      /*color: #333333;*/
+      /*font-weight: bold;*/
+    /*}*/
+    /*margin-bottom: 15px;*/
+  /*}*/
 </style>

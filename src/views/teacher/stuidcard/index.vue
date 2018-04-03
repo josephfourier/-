@@ -1,99 +1,79 @@
 <!-- 教师端学生证管理 -->
 <template>
-  <div class="zjy-app zjy-card">
+  <div class="zjy-app">
+
+    <zjy-table-search>
+      <search-select label="入学年份" :options="years" :value.sync="enterYear"></search-select>
+      <search-select label="申请状态" :options="status" :value.sync="dataStatus"></search-select>
+      <search-input label="学号" :value.sync="studentCode"></search-input>
+      <search-button @query="searchFilter"></search-button>
+    </zjy-table-search>
+
+    <zjy-table-operator>
+      <operator-item @click="batchRemove">批量删除</operator-item>
+    </zjy-table-operator>
 
     <div class="zjy-table">
-      <div class="zjy-table-search">
-        <div class="zjy-table-search__item">
-          <span>入学年份:</span>
-          <el-select v-model="query.enterYear" placeholder="请选择">
-            <el-option v-for="item in years" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div class="zjy-table-search__item">
-          <span>审批状态:</span>
-          <el-select v-model="query.dataStatus" placeholder="请选择">
-            <el-option v-for="item in status" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div class="zjy-table-search__item">
-          <span>学号:</span>
-          <zjy-input v-model="query.studentCode"></zjy-input>
-        </div>
-        <div class="zjy-table-search__item search-btn">
-          <a href="javascript:;" class="zjy-search-panel__button" @click="handleClick"></a>
-        </div>
-      </div>
-      <div class="zjy-table-oper">
-        <div class="zjy-table-oper__item">
-          <div class="zjy-table-oper--del">
-            <a href="javascript:;" @click="batchRemove">批量删除</a>
-          </div>
-        </div>
-      </div>
-      <el-table ref="cardTable" @selection-change="handleSelectionChange" :data="list" style="width: 100%" :row-style="rowStyle" :header-row-style="rowStyle" :header-cell-style="rowStyle" v-loading="loading">
-        <el-table-column type="selection" width="30">
-        </el-table-column>
-        <el-table-column type="index" label="序号" :index="1" width="45">
-        </el-table-column>
-        <el-table-column prop="studentNo" label="学号" width="150">
-        </el-table-column>
-        <el-table-column prop="studentName" label="姓名" width="120">
-        </el-table-column>
-        <el-table-column prop="facultyName" label="院系" width="120">
-        </el-table-column>
-        <el-table-column prop="enterYear" label="入学年份" width="100">
-        </el-table-column>
-        <el-table-column prop="appNum" label="申请次数" width="100">
-        </el-table-column>
-        <el-table-column prop="dataStatus" label="状态" :formatter="statusFormat" width="100">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <div class="btn-group">
-              <a href="javascript:" @click="view(scope.row)" class="zjy-btn-view">
-              <i class="zjy-icon"></i>
-              <span>查看</span>
-            </a>
-
-            <a href="javascript:" @click="del(scope.row)" class="zjy-btn-delete" v-if="scope.row.dataStatus == 1">
-              <i class="zjy-icon"></i>
-              <span>删除</span>
-            </a>
-            </div>
-          </template>
-        </el-table-column>
-
-        <span slot="empty">{{ empty }}</span>
-      </el-table>
+      <zjy-table
+        :data="list"
+        :loading="loading"
+        :columns="columns"
+        @view="view"
+        @delete="_delete">
+      </zjy-table>
     </div>
+
     <div class="zjy-pagination" v-if="list.length !== 0">
       <zjy-pagination :currentPage="currentPage" :total="total" @current-change="currentChange">
       </zjy-pagination>
     </div>
-    <el-dialog title="学生证补办审批" :visible.sync="visible" width="800px">
-      <zjy-approval :uid="uid" :closed="!visible" @submit="handleSubmit"></zjy-approval>
-    </el-dialog>
+
+    <div class="zjy-dialog">
+      <el-dialog title="学生证补办审批" :visible.sync="visible" width="800px">
+        <zjy-process
+          v-if="visible"
+          :data="data"
+          v-model="value"
+          @close="visible = false"
+          @submit="handleSubmit"
+        >
+          <template slot-scope="props">
+            <zjy-form :data="props.formData"></zjy-form>
+          </template>
+        </zjy-process>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
 <script>
+
+import ZjyTableSearch from '@/components/table-search'
+import SearchInput from '@/components/table-search/search-input'
+import SearchButton from '@/components/table-search/search-button'
+import SearchSelect from '@/components/table-search/search-select'
+import ZjyTableOperator from '@/components/table-operator'
+import OperatorItem from '@/components/table-operator/operator-item'
+import ZjyTable from '@/components/table'
+
 import cardAPI from '@/api/teacher/stuidcard'
+import commonAPI from '@/api/common'
 import ZjyPagination from '@/components/pagination'
-import ZjyApproval from './Approval'
-import ZjyInput from '@/components/input'
+
+import { _refresh } from '@/utils'
+import ZjyProcess from '@/components/process'
+import ZjyForm from './form'
 
 export default {
   data () {
     return {
       list: [],
-      // limit: 1, // 测试分页
-      total: 0,
+      total: '',
       currentPage: 1,
       visible: false,
-      uid: '', // 当前查看补办信息的id
+      // uid: '', // 当前查看补办信息的id
+      value: '',
+      data: '',
       query: {
         offset: 0,
         limit: 10,
@@ -101,9 +81,13 @@ export default {
         enterYear: '',
         studentCode: ''
       },
-      loading: true,
-      empty: '数据加载中....',
+      enterYear: '',
+      dataStatus: '',
+      studentCode: '',
+
+      loading: false,
       selectedRows: [],
+
       years: [
         {
           label: 2017,
@@ -133,166 +117,162 @@ export default {
           label: '审批中',
           value: 3
         }
+      ],
+      columns: [
+        {
+          index: true,
+          select: true
+        }, {
+          label: '学号',
+          prop: 'studentNo'
+        }, {
+          label: '姓名',
+          prop: 'studentName'
+        }, {
+          label: '院系',
+          prop: 'facultyName'
+        }, {
+          label: '入学年份',
+          prop: 'enterYear'
+        }, {
+          label: '申请次数',
+          prop: 'appNum'
+        }, {
+          label: '状态',
+          prop: 'dataStatus',
+          formatter: this.statusFormat
+        }, {
+          label: '操作',
+          width: '200',
+          operators: [
+            {
+              label: '查看',
+              render: true,
+              cmd: 'view'
+            },
+            {
+              label: '删除',
+              render: true,
+              cmd: 'delete'
+            }
+          ]
+        }
       ]
     }
   },
 
   methods: {
     view (row) {
-      this.uid = row.stuidcardUid
-      this.visible = true
+      commonAPI.queryApprovalProcess(row.studentId, row.stuidcardUid).then(response => {
+        this.data = row
+        this.value = response.data
+        this.visible = true
+      })
     },
 
     handleSelectionChange (rows) {
       this.selectedRows = rows
     },
 
-    handleClick () {
-      this.loading = true
-      this.query.offset = this.query.limit * (this.currentPage - 1)
-      cardAPI
-        .queryForList(this.query)
-        .then(response => {
-          this.loading = false
-          this.list = response.rows
-          this.total = response.total
-        })
-        .catch(err => {
-          this.loading = false
-        })
+    searchFilter () {
+      this.currentPage = 1
+      this.query.dataStatus = this.dataStatus
+      this.query.enterYear = this.enterYear
+      this.query.studentCode = this.studentCode
+      this.refresh()
     },
 
-    // approval组件提交请求后关闭弹窗
-    handleSubmit (error) {
-      this.visible = false
-      // 如果是正常提交数据则需要刷新
-      if (!error) {
-        const old = this.currentPage
-        this.currentPage = -1
-        setTimeout(() => (this.currentPage = old), 100)
-      }
+    handleSubmit (data, steps) {
+      cardAPI.approved(this.data, steps).then(response => {
+        if (response.code === 1) {
+          this.$alert('保存成功')
+          this.refresh()
+          this.visible = false
+        } else {
+          this.$alert('保存失败')
+        }
+      }).catch(error => {})
     },
 
     batchRemove () {
       if (this.selectedRows.length === 0) return
+
       let ids = ''
       this.selectedRows.forEach(x => {
         ids += '-' + x.studentId + '-'
       })
       this.loading = true
-      cardAPI
-        .batchRemove(ids.replace(/^-|-$/g, ''))
-        .then(response => {
-          this.loading = false
-          this.refresh()
-        })
-        .catch(error => {})
+      cardAPI.batchRemove(ids.replace(/^-|-$/g, '')).then(response => {
+        this.loading = false
+        this.refresh()
+      }).catch(error => {
+        console.log(error)
+      })
     },
 
-    del (row) {
+    _delete (row) {
       this.loading = true
-      cardAPI
-        .batchRemove(row.studentId)
-        .then(response => {
-          this.loading = false
-          this.refresh()
-        })
-        .catch(error => {})
+      cardAPI.batchRemove(row.studentId).then(response => {
+        this.loading = false
+        this.refresh()
+      }).catch(error => {
+        console.log(error)
+      })
     },
 
     currentChange (pageNumber) {
       this.currentPage = pageNumber
     },
 
-    rowStyle ({ row, rowIndex }) {
-      return {
-        textAlign: 'center'
-      }
-    },
-
-    statusFormat (row, column, cellValue) {
+    statusFormat (cellValue) {
       return ['待审批', '已通过', '已拒绝', '审批中'][+cellValue]
     },
 
     refresh () {
-      this.loading = true
-      this.query.offset = this.query.limit * (this.currentPage - 1)
-      cardAPI
-        .queryForList(this.query)
-        .then(response => {
-          this.list = response.rows
-          this.total = response.total
-          this.loading = false
-        })
-        .catch(err => {})
+      _refresh.call(this)
     }
   },
 
   components: {
+    ZjyTableSearch,
+    SearchInput,
+    SearchButton,
     ZjyPagination,
-    ZjyApproval,
-    ZjyInput
-  },
+    SearchSelect,
+    ZjyTableOperator,
+    OperatorItem,
+    ZjyTable,
+    ZjyProcess,
 
-  computed: {},
+    ZjyForm
+  },
 
   watch: {
     currentPage: {
       immediate: true,
       handler (val, oldval) {
         if (val === -1) return
-        this.query.offset = this.query.limit * (val - 1)
-        cardAPI
-          .queryForList(this.query)
-          .then(response => {
-            console.log(response)
-            if (response.code !== 1) {
-              this.$alert(response.message)
-              return
-            }
 
+        this.query.offset = this.query.limit * (val - 1)
+        cardAPI.queryForList(this.query).then(response => {
+          if (response.code !== 1) {
+            this.$alert(response.message)
+          } else {
             this.list = response.rows
             this.total = response.total
             this.loading = false
-          })
-          .catch(err => {})
+          }
+        }).catch(error => {
+          console.log(error)
+        })
       }
     },
-
-    visible (val) {
-      if (!val) this.uid = ''
-    },
-
-    list (val, oldVal) {
-      this.empty = val.length === 0 ? '暂无数据' : '数据加载中....'
-    }
+    //
+    // visible (val) {
+    //   if (!val) this.uid = ''
+    // }
   }
 }
 </script>
 <style lang='scss' scoped>
-.zjy-btn-view {
-  margin: 0 10px;;
-}
-.zjy-search-panel__button {
-  background: #37c6d4 url(./ic_search.png) 16px 10px no-repeat;
-  width: 50px;
-  height: 34px;
-  display: inline-block;
-  vertical-align: top;
-}
-
-.zjy-table-oper {
-  padding: 10px 0;
-  .zjy-table-oper__item {
-    display: inline-block;
-    font-size: 12px;
-  }
-
-}
-
-.btn-group {
-  width: 150px;
-  margin: 0 auto;
-  text-align: left;
-}
 </style>

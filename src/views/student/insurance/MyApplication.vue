@@ -19,38 +19,36 @@
       </div>
       <p>审批流程</p>
 
-        <p v-if="steps.length === 0">还未配置流程</p>
-        <div class="zjy-steps" v-else>
-          <zjy-steps :active="step" align-center>
-            <zjy-step title="发起人" :description="'(' + user.fullName + ')'">
-            </zjy-step>
-            <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">
-              <div slot="description">
-                <div v-if="item.approvalType == 2 || item.approvalStatus">
-                  ({{ item.teacherName }})
-                </div>
+      <p v-if="steps.length === 0">还未配置流程</p>
+      <div class="zjy-steps" v-else>
+        <zjy-steps :active="step" align-center>
+          <zjy-step title="发起人" :description="'(' + user.fullName + ')'">
+          </zjy-step>
+          <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">
+            <div slot="description">
+              <div v-if="item.approvalType == 2 || item.approvalStatus">
+                ({{ item.teacherName }})
+              </div>
 
-                <div v-if="index <= step - 1 && item.approvalStatus">
-                  <p :class="[
+              <div v-if="index <= step - 1 && item.approvalStatus">
+                <p :class="[
                 { statusYes: item.approvalStatus == 1 },
                 { statusNo: item.approvalStatus == 2 },
                 { statusWait: item.approvalStatus == 0 },
                   'status'
                 ]">
-                    ({{ item.approvalStatus | statusFormat }})
-                  </p>
-                </div>
+                  ({{ item.approvalStatus | statusFormat }})
+                </p>
               </div>
-            </zjy-step>
-          </zjy-steps>
-        </div>
+            </div>
+          </zjy-step>
+        </zjy-steps>
+      </div>
 
       <p v-if="reason && isFinished" class="refused">拒绝原因: {{ reason }}</p>
       <div class="zjy-footer" v-if="isFinished && !reason">
-
         <zjy-button type="plain" @click="$emit('close')">取 消</zjy-button>
         <zjy-button type="primary" @click="pay">立即支付</zjy-button>
-
       </div>
     </panel>
   </div>

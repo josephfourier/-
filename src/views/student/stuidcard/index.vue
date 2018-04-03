@@ -38,7 +38,7 @@
     <div v-if="steps.length !== 0">
       <div class="zjy-steps">
         <p>申请流程配置</p>
-        <zjy-steps :active="step" align-center>
+        <zjy-steps :active="step" :space="130">
           <zjy-step title="发起人" :description="'(' + student.studentName + ')'" v-if="steps.length !== 0">
           </zjy-step>
           <zjy-step v-for="(item,index) in steps" :key="item.approvalStep" :title="item.postName" :custom="item">

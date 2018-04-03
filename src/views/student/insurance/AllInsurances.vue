@@ -42,13 +42,17 @@
     </div>
 
     <el-dialog :title="title" :visible.sync="visible" width="800px">
-      <application
-        :data="setting"
+      <student-process
+        :data="data"
         v-model="value"
-        :closed="!visible"
         :type="type"
+        :visible.sync="visible"
         @submit="handleSubmit"
-      ></application>
+      >
+        <template slot-scope="props">
+          <zjy-form :data="props.formData"></zjy-form>
+        </template>
+      </student-process>
     </el-dialog>
   </div>
 </template>
@@ -57,15 +61,16 @@
 import insuranceAPI from '@/api/student/insurance/all'
 import commonAPI from '@/api/common'
 import ZjyPagination from '@/components/pagination'
-import Application from './Application'
 import { getPermissionId } from '@/utils'
 
+import StudentProcess from './StudentProcess'
+import ZjyForm from './form'
 import axios from 'axios'
 
 export default {
   data () {
     return {
-      setting: {}, // 保单设置详情
+      data: {}, // 保单设置详情
       value: {},   // 保单对应审批
       list: [],
       currentPage: 1,
@@ -91,13 +96,25 @@ export default {
       return ['可申请', '申请中'][+cellValue]
     },
 
-    handleSubmit (val) {
-      this.visible = false
-      // 查看操作时关闭
+    handleSubmit (data, steps) {
 
-      if (val === 1) {
-        this.refresh()
-      }
+      insuranceAPI.create(data.inssettingUid, steps).then(response => {
+        if (response.code === 1) {
+          this.$alert('申请成功')
+          this.visible = false
+          this.refresh()
+        } else {
+          this.$alert(response.message)
+        }
+      }).catch(error => {
+
+      })
+      // this.visible = false
+      // // 查看操作时关闭
+      //
+      // if (val === 1) {
+      //   this.refresh()
+      // }
     },
 
     rowStyle ({ row, rowIndex }) {
@@ -109,31 +126,26 @@ export default {
     view (row) {
       this.title = '保单详情'
       this.type = this.types.VIEW
-      insuranceAPI
-        .queryForObject(row.inssettingUid)
-        .then(response => {
-          this.setting = response.data
-          this.visible = true
-        })
-        .catch(error => {})
+      insuranceAPI.queryForObject(row.inssettingUid).then(response => {
+        this.data = response.data
+        this.visible = true
+      }).catch(error => {})
     },
 
     create (row) {
       this.title = '保单申请'
       this.type = this.types.APPLY
 
-      axios
-        .all([
-          commonAPI.queryInitial(getPermissionId(this.$route)),
-          insuranceAPI.queryForObject(row.inssettingUid)
-        ])
-        .then(
-          axios.spread((r1, r2) => {
-            this.value = r1.data
-            this.setting = r2.data
-            this.visible = true
-          })
-        )
+      axios.all([
+        commonAPI.queryInitial(getPermissionId(this.$route)),
+        insuranceAPI.queryForObject(row.inssettingUid)
+      ]).then(
+        axios.spread((r1, r2) => {
+          this.value = r1.data
+          this.data = r2.data
+          this.visible = true
+        })
+      )
     },
 
     currentChange (pageNumber) {
@@ -151,7 +163,9 @@ export default {
 
   components: {
     ZjyPagination,
-    Application
+
+    StudentProcess,
+    ZjyForm
   },
 
   props: {
@@ -166,14 +180,11 @@ export default {
 
         this.loading = true
         this.query.offset = this.query.limit * (val - 1)
-        insuranceAPI
-          .queryForList(this.query)
-          .then(response => {
+        insuranceAPI.queryForList(this.query).then(response => {
             this.list = response.rows
             this.total = response.total
             this.loading = false
-          })
-          .catch(err => {
+          }).catch(err => {
             this.loading = false
           })
       }

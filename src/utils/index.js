@@ -96,4 +96,12 @@ let dateFormat =  val => {
   )
 }
 
-export { resolve, relogin, reback, param2Obj, selfMerge, dateFormat, getPermissionId }
+function refresh ()  {
+  const old = this.currentPage
+  this.currentPage = -1
+  setTimeout(_ => {
+    this.currentPage = old
+  }, +this.$t('zjy.refresh.delay'))
+}
+
+export { resolve, relogin, reback, param2Obj, selfMerge, dateFormat, getPermissionId, refresh as _refresh }
